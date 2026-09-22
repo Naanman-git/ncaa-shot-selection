@@ -1,0 +1,605 @@
+{
+  "run_id": "ncaa-586d483b1c-374f8136",
+  "generated_utc": "2026-09-21T19:09:46.757144+00:00",
+  "config": {
+    "protocol_version": "1.0",
+    "training_seasons": [
+      2023,
+      2024
+    ],
+    "selection_season": 2025,
+    "final_test_season": 2026,
+    "candidates": [
+      "Global rate",
+      "Zone shrinkage",
+      "Spatial logistic",
+      "Spatial + player history"
+    ],
+    "selection_metric": "log_loss",
+    "history_prior_attempts": 30,
+    "zone_prior_attempts": 30,
+    "bootstrap_repeats": 500,
+    "seed": 42,
+    "case_study_team": "Ohio State Buckeyes",
+    "scenario": {
+      "max_shift": 0.05,
+      "budget": 0.2,
+      "three_cap": 0.6,
+      "risk": 1.0
+    },
+    "notes": "Protocol fixed before inspecting 2026 model outcomes. Earlier exploratory 2025 results are superseded. Selection minimizes 2025 log loss; no refit on 2025. Player history updates only from earlier dates within the same season."
+  },
+  "data_sha256": "586d483b1c94707dd94d813f7167b9570efdd69894545f5af99671fc523f2d45",
+  "config_sha256": "374f8136f61a8eb8a606be96ed2a3b058096978b7aecaff810b61c60cb98d622",
+  "selected_model": "Spatial + player history",
+  "model_comparison": [
+    {
+      "model": "Global rate",
+      "season": 2025,
+      "n": 599333,
+      "brier": 0.24674636536315722,
+      "log_loss": 0.6866257764823301
+    },
+    {
+      "model": "Zone shrinkage",
+      "season": 2025,
+      "n": 599333,
+      "brier": 0.23178638168247162,
+      "log_loss": 0.6561635345032727
+    },
+    {
+      "model": "Spatial logistic",
+      "season": 2025,
+      "n": 599333,
+      "brier": 0.23013693743916677,
+      "log_loss": 0.6527185086502225
+    },
+    {
+      "model": "Spatial + player history",
+      "season": 2025,
+      "n": 599333,
+      "brier": 0.22973423348747374,
+      "log_loss": 0.6518436173460246
+    },
+    {
+      "model": "Global rate",
+      "season": 2026,
+      "n": 614611,
+      "brier": 0.2472354947638472,
+      "log_loss": 0.687608577309446
+    },
+    {
+      "model": "Zone shrinkage",
+      "season": 2026,
+      "n": 614611,
+      "brier": 0.2320407555372355,
+      "log_loss": 0.6566765793707884
+    },
+    {
+      "model": "Spatial logistic",
+      "season": 2026,
+      "n": 614611,
+      "brier": 0.23061814830508606,
+      "log_loss": 0.6537351308253899
+    },
+    {
+      "model": "Spatial + player history",
+      "season": 2026,
+      "n": 614611,
+      "brier": 0.23018319654439026,
+      "log_loss": 0.6527906656337843
+    }
+  ],
+  "calibration": [
+    {
+      "season": 2025,
+      "bin": 1,
+      "n": 225,
+      "mean_predicted": 0.17776046061678522,
+      "observed": 0.15555555555555556
+    },
+    {
+      "season": 2025,
+      "bin": 2,
+      "n": 9996,
+      "mean_predicted": 0.2866358325925862,
+      "observed": 0.2923169267707083
+    },
+    {
+      "season": 2025,
+      "bin": 3,
+      "n": 325376,
+      "mean_predicted": 0.3486917981709559,
+      "observed": 0.34765625
+    },
+    {
+      "season": 2025,
+      "bin": 4,
+      "n": 95521,
+      "mean_predicted": 0.4462296036094615,
+      "observed": 0.44668711592215327
+    },
+    {
+      "season": 2025,
+      "bin": 5,
+      "n": 53678,
+      "mean_predicted": 0.5626164262653655,
+      "observed": 0.5611796266626924
+    },
+    {
+      "season": 2025,
+      "bin": 6,
+      "n": 84946,
+      "mean_predicted": 0.6432838676375675,
+      "observed": 0.6523202976008288
+    },
+    {
+      "season": 2025,
+      "bin": 7,
+      "n": 29556,
+      "mean_predicted": 0.734858928750426,
+      "observed": 0.7158275815401273
+    },
+    {
+      "season": 2025,
+      "bin": 8,
+      "n": 35,
+      "mean_predicted": 0.8036414280538579,
+      "observed": 0.8285714285714286
+    },
+    {
+      "season": 2026,
+      "bin": 1,
+      "n": 171,
+      "mean_predicted": 0.17714185328297027,
+      "observed": 0.23976608187134502
+    },
+    {
+      "season": 2026,
+      "bin": 2,
+      "n": 9644,
+      "mean_predicted": 0.2865055224972981,
+      "observed": 0.2992534218166736
+    },
+    {
+      "season": 2026,
+      "bin": 3,
+      "n": 331058,
+      "mean_predicted": 0.34874339071550514,
+      "observed": 0.3497967123585595
+    },
+    {
+      "season": 2026,
+      "bin": 4,
+      "n": 96102,
+      "mean_predicted": 0.44632761813412675,
+      "observed": 0.4499802293396599
+    },
+    {
+      "season": 2026,
+      "bin": 5,
+      "n": 57444,
+      "mean_predicted": 0.5626100382911275,
+      "observed": 0.5634879186686164
+    },
+    {
+      "season": 2026,
+      "bin": 6,
+      "n": 89239,
+      "mean_predicted": 0.6430572668529374,
+      "observed": 0.6549938928047154
+    },
+    {
+      "season": 2026,
+      "bin": 7,
+      "n": 30869,
+      "mean_predicted": 0.7351952623937534,
+      "observed": 0.7102594836243481
+    },
+    {
+      "season": 2026,
+      "bin": 8,
+      "n": 84,
+      "mean_predicted": 0.8054101416114081,
+      "observed": 0.8452380952380952
+    }
+  ],
+  "test_confidence_intervals": {
+    "brier": {
+      "low": 0.22984908452182323,
+      "high": 0.23055042671021517
+    },
+    "log_loss": {
+      "low": 0.6520894174233313,
+      "high": 0.653554510809433
+    },
+    "brier_difference": {
+      "low": -0.0019699515826887316,
+      "high": -0.0017486726493637268
+    }
+  },
+  "season_summary": [
+    {
+      "season": 2023,
+      "attempts": 536021,
+      "games": 4686,
+      "teams": 359,
+      "players": 4755,
+      "fg_pct": 0.4408409372020872,
+      "date_start": "2022-11-07",
+      "date_end": "2023-04-03"
+    },
+    {
+      "season": 2024,
+      "attempts": 579312,
+      "games": 4967,
+      "teams": 358,
+      "players": 4764,
+      "fg_pct": 0.44159969066755045,
+      "date_start": "2023-11-06",
+      "date_end": "2024-04-08"
+    },
+    {
+      "season": 2025,
+      "attempts": 599333,
+      "games": 5169,
+      "teams": 361,
+      "players": 4811,
+      "fg_pct": 0.4429340616985883,
+      "date_start": "2024-11-04",
+      "date_end": "2025-04-07"
+    },
+    {
+      "season": 2026,
+      "attempts": 614611,
+      "games": 5276,
+      "teams": 365,
+      "players": 4820,
+      "fg_pct": 0.4470958053142557,
+      "date_start": "2025-11-03",
+      "date_end": "2026-04-06"
+    }
+  ],
+  "audit": {
+    "source": "SportsDataverse ncaa_mbb_shots",
+    "source_documentation": "https://github.com/sportsdataverse/hoopR/blob/main/R/load_ncaa_mbb.R",
+    "seasons": [
+      {
+        "season": 2023,
+        "rows": 702760,
+        "games": 6129,
+        "teams": 704,
+        "shooters": 8335,
+        "make_rate": 0.43935482952928456,
+        "three_point_share": 0.3785260971028516,
+        "coordinate_rows": 702760,
+        "zones": {
+          "paint": 210459,
+          "abovebreak3": 205247,
+          "rim": 176081,
+          "corner3": 60766,
+          "mid": 50207
+        },
+        "team_rows": {
+          "count": 704.0,
+          "mean": 998.2386363636364,
+          "std": 896.3675137147085,
+          "min": 38.0,
+          "25%": 64.0,
+          "50%": 1537.5,
+          "75%": 1851.25,
+          "max": 2305.0
+        }
+      },
+      {
+        "season": 2024,
+        "rows": 724243,
+        "games": 6204,
+        "teams": 716,
+        "shooters": 8532,
+        "make_rate": 0.4397695248694154,
+        "three_point_share": 0.37748518107872636,
+        "coordinate_rows": 724243,
+        "zones": {
+          "paint": 216977,
+          "abovebreak3": 210944,
+          "rim": 185235,
+          "corner3": 62447,
+          "mid": 48640
+        },
+        "team_rows": {
+          "count": 716.0,
+          "mean": 1011.5125698324023,
+          "std": 923.8581104441238,
+          "min": 41.0,
+          "25%": 65.0,
+          "50%": 1460.5,
+          "75%": 1905.0,
+          "max": 2472.0
+        }
+      },
+      {
+        "season": 2025,
+        "rows": 730963,
+        "games": 6291,
+        "teams": 700,
+        "shooters": 8471,
+        "make_rate": 0.44087183619417125,
+        "three_point_share": 0.39405688112804615,
+        "coordinate_rows": 730963,
+        "zones": {
+          "abovebreak3": 221741,
+          "paint": 211182,
+          "rim": 189592,
+          "corner3": 66300,
+          "mid": 42148
+        },
+        "team_rows": {
+          "count": 700.0,
+          "mean": 1044.2328571428573,
+          "std": 921.9053751916603,
+          "min": 39.0,
+          "25%": 66.0,
+          "50%": 1667.0,
+          "75%": 1921.0,
+          "max": 2491.0
+        }
+      }
+    ],
+    "cleaning": {
+      "rows_before": 2173524,
+      "exact_duplicate_rows_removed": 15558,
+      "rows_after_exact_deduplication": 2157966,
+      "rows_excluded_from_model": 0,
+      "rows_in_model": 2157966,
+      "excluded_by_missing_or_invalid_field": {
+        "point_value": 0,
+        "made": 0,
+        "shot_zone": 0,
+        "contest_id": 0,
+        "team_id": 0,
+        "shooter_id": 0,
+        "coordinates_or_distance": 0
+      },
+      "seasons": [
+        2023,
+        2024,
+        2025
+      ],
+      "zones": {
+        "paint": 638618,
+        "abovebreak3": 637932,
+        "rim": 550908,
+        "corner3": 189513,
+        "mid": 140995
+      }
+    },
+    "missingness_after_cleaning": {
+      "season": 0,
+      "team_id": 0,
+      "shooter_id": 0,
+      "shot_x": 0,
+      "shot_y": 0,
+      "dist_ft": 0,
+      "shot_zone": 0,
+      "made": 0,
+      "point_value": 0,
+      "contest_id": 0,
+      "ncaa_team_id": 111765,
+      "espn_team_id": 111765,
+      "shooter_player_id": 124015,
+      "shooter_clean_name": 124015,
+      "espn_game_id": 1359,
+      "source_file": 0,
+      "expected_value_if_made": 0,
+      "shot_uid": 0
+    },
+    "source_files": [
+      {
+        "file": "data/raw/ncaa_mbb_shots_2023.parquet",
+        "bytes": 8991742,
+        "sha256": "b5065e503e6d567cf51b9071f6b03733ed861ff591b4c8290e87d0f83d40ed0f",
+        "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/ncaa_mbb_shots/ncaa_mbb_shots_2023.parquet"
+      },
+      {
+        "file": "data/raw/ncaa_mbb_shots_2024.parquet",
+        "bytes": 9153055,
+        "sha256": "20764cf841723a25a88e2a7f369be0c8f5a3d54cae77978355f24969efaaa65f",
+        "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/ncaa_mbb_shots/ncaa_mbb_shots_2024.parquet"
+      },
+      {
+        "file": "data/raw/ncaa_mbb_shots_2025.parquet",
+        "bytes": 8806252,
+        "sha256": "3ea35a75bd4beebb53803880dd2e0519d073797bfb1a6e5ec00a1734157994b0",
+        "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/ncaa_mbb_shots/ncaa_mbb_shots_2025.parquet"
+      }
+    ],
+    "limitations": [
+      "The source shot table has no complete season-type field; regular-season filtering needs a documented crosswalk.",
+      "The source has no defender distance, shot-clock time, or shot-mechanism feature.",
+      "Exact duplicate rows are removed; near-identical shots are retained because they can represent real attempts."
+    ]
+  },
+  "zone_prior": {
+    "abovebreak3": 0.332604103417145,
+    "corner3": 0.35939220071678024,
+    "mid": 0.3695247685733301,
+    "paint": 0.4153416423899394,
+    "rim": 0.6400963496720851
+  },
+  "scenario": {
+    "table": [
+      {
+        "zone": "rim",
+        "count": 450,
+        "current_share": 0.2498611882287618,
+        "recommended_share": 0.2998611882287618,
+        "ep": 1.388345377042344,
+        "ep_low": 1.2774194877286968,
+        "ep_high": 1.4897030272373162,
+        "eligible": true
+      },
+      {
+        "zone": "paint",
+        "count": 540,
+        "current_share": 0.29983342587451417,
+        "recommended_share": 0.2998334258745141,
+        "ep": 1.0261763132340287,
+        "ep_low": 0.9483652160171344,
+        "ep_high": 1.117081623633905,
+        "eligible": true
+      },
+      {
+        "zone": "mid",
+        "count": 92,
+        "current_share": 0.05108273181565797,
+        "recommended_share": 0.0010827318156579682,
+        "ep": 0.8046843124131132,
+        "ep_low": 0.6547363163959881,
+        "ep_high": 0.9856070289076796,
+        "eligible": true
+      },
+      {
+        "zone": "corner3",
+        "count": 121,
+        "current_share": 0.06718489727928928,
+        "recommended_share": 0.017184897279289277,
+        "ep": 1.0685119077119882,
+        "ep_low": 0.8543238067195741,
+        "ep_high": 1.274337675508161,
+        "eligible": true
+      },
+      {
+        "zone": "abovebreak3",
+        "count": 598,
+        "current_share": 0.3320377568017768,
+        "recommended_share": 0.38203775680177676,
+        "ep": 1.0365196963495908,
+        "ep_low": 0.9387107636149518,
+        "ep_high": 1.1355833614134871,
+        "eligible": true
+      }
+    ],
+    "current_ep": 1.1116325956733162,
+    "recommended_ep": 1.1392160383366576,
+    "gain_per100": 2.758344266334159,
+    "gain_low": 1.5647978083076637,
+    "gain_high": 4.057365509902208,
+    "feasible": true,
+    "message": "Solved within all stated constraints.",
+    "bootstrap_repeats": 500,
+    "interpretation": "Descriptive, conditional on unchanged zone accuracy. The fixed-mix game-bootstrap range does not account for optimization selection, opponent response, or causal effects.",
+    "team": "Ohio State Buckeyes",
+    "season": 2026,
+    "attempts": 1801,
+    "games": 32,
+    "settings": {
+      "max_shift": 0.05,
+      "budget": 0.2,
+      "three_cap": 0.6,
+      "risk": 1.0
+    }
+  },
+  "sensitivity": [
+    {
+      "max_shift": 0.025,
+      "risk": 0.0,
+      "gain_per100": 1.5649916477679822,
+      "gain_low": 0.7167226356868385,
+      "gain_high": 2.2706381174238675,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.025,
+      "risk": 1.0,
+      "gain_per100": 1.379172133167083,
+      "gain_low": 0.7823989041538354,
+      "gain_high": 2.028682754951109,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.025,
+      "risk": 2.0,
+      "gain_per100": 1.3533136753781776,
+      "gain_low": 0.7194675489957102,
+      "gain_high": 1.963029233123929,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.05,
+      "risk": 0.0,
+      "gain_per100": 3.1299832955359568,
+      "gain_low": 1.4334452713736712,
+      "gain_high": 4.541276234847729,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.05,
+      "risk": 1.0,
+      "gain_per100": 2.758344266334159,
+      "gain_low": 1.5647978083076637,
+      "gain_high": 4.057365509902208,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.05,
+      "risk": 2.0,
+      "gain_per100": 2.7066273507563476,
+      "gain_low": 1.4389350979914124,
+      "gain_high": 3.926058466247851,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.1,
+      "risk": 0.0,
+      "gain_per100": 4.753132285807984,
+      "gain_low": 3.2888204659649825,
+      "gain_high": 6.083392327197611,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.1,
+      "risk": 1.0,
+      "gain_per100": 4.546038122925797,
+      "gain_low": 3.1297403375826818,
+      "gain_high": 6.121732464478211,
+      "feasible": true
+    },
+    {
+      "max_shift": 0.1,
+      "risk": 2.0,
+      "gain_per100": 4.546038122925794,
+      "gain_low": 3.1297403375826782,
+      "gain_high": 6.1217324644782085,
+      "feasible": true
+    }
+  ],
+  "limitations": [
+    "Filtered, reconciled NCAA Division I men versus men cohort; not complete NCAA coverage.",
+    "Native chart coordinates are discretized. Geometry and aggregate box checks do not establish shot-level tracking accuracy.",
+    "No defender distance, play context, shot clock or reliable period timing; predictions describe recorded locations and prior shooting history.",
+    "Online chronological evaluation: earlier test-date outcomes may update player histories; current and future outcomes are excluded.",
+    "Model probabilities are evaluated with calibration curves; no separate post-hoc calibration transform is applied.",
+    "Scenario uses 30-attempt shrinkage of selected-scope zone rates, separate from the predictive model; player suggestions with sparse zones are frozen.",
+    "Bootstrap ranges resample games and condition on a fixed chosen mix. They exclude policy selection and causal uncertainty.",
+    "A higher estimated scenario score is not evidence of improved game outcomes. Defensive response, possession changes and free throws are omitted.",
+    "Anonymous or abbreviated identities and partial reconciliation can introduce coverage bias; consult the data audit.",
+    "Public access and code licensing do not establish permission to redistribute the upstream sports data."
+  ],
+  "model_spec": {
+    "training": "2022\u201323 and 2023\u201324",
+    "selection": "2024\u201325",
+    "final_test": "2025\u201326",
+    "features": [
+      "five chart zones",
+      "cubic distance spline (5 knots)",
+      "absolute angle",
+      "prior-day player-zone make rate (30 fixed-prior attempts)",
+      "log prior attempts"
+    ],
+    "estimator": "L2 logistic regression; C=1; maximum 300 iterations; train-only transformations",
+    "bootstrap": "500 paired game-cluster resamples; seed 42; 2.5th\u201397.5th percentiles",
+    "prediction_target": "Probability that an attempted field goal is made",
+    "scenario_target": "Conditional points per recorded field-goal attempt; excludes free throws and possession value"
+  }
+}

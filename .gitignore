@@ -1,0 +1,16 @@
+.research-deps/
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+# The raw NCAA/ESPN downloads are large source inputs and should stay local.
+data/raw/
+
+# Full modeling intermediates and generated outputs stay local. The compact
+# tracked deployment snapshot lives under data/app/.
+data/processed/
+data/outputs/
+
+.pytest_cache/
+tmp/
+.artifact-build/

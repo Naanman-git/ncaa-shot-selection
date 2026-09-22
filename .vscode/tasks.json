@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CourtSense: setup",
+      "type": "shell",
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/setup.py"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "CourtSense: install dependencies",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": ["-m", "pip", "install", "-r", "${workspaceFolder}/scripts/requirements-dev.txt"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    },
+    {
+      "label": "CourtSense: run dashboard",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": ["${workspaceFolder}/scripts/launch.py"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "CourtSense: run tests",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": ["-m", "pytest", "-q", "tests"],
+      "options": {"cwd": "${workspaceFolder}", "env": {"PYTHONPATH": "${workspaceFolder}/src"}},
+      "problemMatcher": []
+    }
+  ]
+}

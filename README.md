@@ -23,8 +23,8 @@ Setup finds Python 3.11–3.14 (tested here with 3.12), creates `.venv`, and ins
 
 The error in the screenshot is a repository connection message, not an application exception. Community Cloud can deploy only from a GitHub repository that your Streamlit account can access. This project now includes the required root `requirements.txt`, `runtime.txt`, `.streamlit/config.toml`, and a compact dashboard snapshot under `data/app/`.
 
-1. Create a GitHub repository and upload this project folder, including `app.py`, `requirements.txt`, `.streamlit/`, `src/`, and `data/app/`.
-2. In Streamlit Community Cloud, choose **Deploy an app**, select that repository, and set the main file to `app.py`.
+1. Connect your GitHub account to Streamlit Community Cloud and grant it access to the private `Naanman-git/ncaa-shot-selection` repository.
+2. Choose **Deploy an app**, select `main`, and set the main file to `app.py`.
 3. In Advanced settings select Python 3.12, matching the tested local environment, then deploy. The Python selector is authoritative; do not rely on `runtime.txt` to configure Community Cloud.
 
 Do not upload `data/raw/`, `.research-deps/`, or the large local build artifacts under `data/processed/` and `data/outputs/`; they are excluded from the deployment package. If you regenerate the analysis, run `PYTHONPATH=src .venv/bin/python scripts/prepare_deployment.py` and commit the updated `data/app/` snapshot. Streamlit’s deployment environment reads dependencies from the root `requirements.txt` and copies files that are present in the repository.

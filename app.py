@@ -1,0 +1,298 @@
+"""NCAA Division I men's basketball research and portfolio explorer."""
+from __future__ import annotations
+
+from html import escape
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / "src"))
+
+import pandas as pd
+import streamlit as st
+
+from ncaa_shot_selection.charts import (
+    ZONE_NAMES, calibration_figure, court_bins, court_heatmap, mix_figure,
+)
+from ncaa_shot_selection.product import (
+    load_analysis, load_scored_data, run_scenario, scope_summary,
+)
+from ncaa_shot_selection.streamlit_compat import full_width_kwargs
+
+st.set_page_config(page_title="CourtSense · NCAA shot selection", page_icon="🏀", layout="wide", initial_sidebar_state="expanded")
+
+st.markdown("""
+<style>
+  .stApp { background: #fcfaf5; }
+  .block-container { max-width: 1480px; padding-top: 2.25rem; padding-bottom: 3rem; }
+  [data-testid="stSidebar"] { border-right: 1px solid #dedfd8; }
+  [data-testid="stSidebar"] .block-container { padding-top: 2rem; }
+  h1, h2, h3 { color: #172b3a; letter-spacing: -.03em; }
+  h1 { font-family: Georgia, serif; font-size: 3.5rem !important; font-weight: 500 !important; padding-top: .2rem !important; }
+  h2 { font-size: 1.55rem !important; }
+  h3 { font-size: 1.12rem !important; }
+  .eyebrow { color: #167d8d; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin: .2rem 0 .35rem; }
+  .lead { color: #596c75; font-size: 1.05rem; max-width: 790px; line-height: 1.65; margin-bottom: 1.5rem; }
+  .masthead { display:flex; justify-content:space-between; align-items:center; padding-bottom: .8rem; border-bottom:1px solid #d8dedb; margin-bottom:1.8rem; color:#172b3a; }
+  .brand { font-size:1.15rem; letter-spacing:-.02em; font-weight:750; }
+  .brand i { color:#c36333; font-style:normal; }
+  .edition { font-size:.75rem; color:#65737a; }
+  .scope-line { color:#64727a; font-size:.88rem; margin-top:-.5rem; margin-bottom:1.2rem; }
+  .note { border-left: 3px solid #167d8d; padding: .65rem 1rem; color:#4c646d; background:#edf3ef; border-radius:0 5px 5px 0; line-height:1.55; margin:.7rem 0 1.3rem; font-size:.9rem; }
+  [data-testid="stMetric"] { background:#f1f1e9; border:1px solid #e2e4da; border-radius:7px; padding:.9rem 1rem; }
+  [data-testid="stMetricValue"] { font-size:1.85rem; color:#172b3a; }
+  [data-testid="stMetricLabel"] { color:#60717a; font-size:.78rem; }
+  .stTabs [data-baseweb="tab-list"] { border-bottom:1px solid #d8dedb; gap:1.3rem; margin:1.2rem 0; }
+  .stTabs [data-baseweb="tab"] { font-size:.87rem; }
+  .footer { border-top:1px solid #d8dedb; padding-top:1rem; margin-top:2.3rem; color:#758188; font-size:.76rem; }
+  @media(max-width:700px) { h1 {font-size:2.4rem !important;} .edition{display:none;} .block-container{padding:1.2rem 1rem;} }
+</style>
+""", unsafe_allow_html=True)
+
+
+@st.cache_data(show_spinner="Loading the research snapshot…")
+def analysis_data():
+    return load_analysis(), load_scored_data()
+
+
+@st.cache_data(show_spinner=False, max_entries=20)
+def scenario_data(df: pd.DataFrame, max_shift: float, budget: float, three_cap: float, risk: float):
+    return run_scenario(df, max_shift=max_shift, budget=budget, three_cap=three_cap, risk=risk, seed=42)
+
+
+def csv_bytes(frame: pd.DataFrame) -> bytes:
+    return frame.to_csv(index=False).encode("utf-8")
+
+
+def plotly_chart(figure, *, key: str | None = None):
+    """Render a Plotly figure across Streamlit's width API transition.
+
+    Some older Streamlit installations expose only ``use_container_width``;
+    newer installations expose ``width="stretch"``. Passing an unsupported
+    argument through the legacy ``**kwargs`` path produces the yellow warning
+    shown in the app. Inspecting the installed function keeps the project
+    runnable in VS Code environments with either API.
+    """
+    kwargs = {"config": {"displayModeBar": False}}
+    kwargs.update(full_width_kwargs(st.plotly_chart))
+    if key is not None:
+        kwargs["key"] = key
+    return st.plotly_chart(figure, **kwargs)
+
+
+def dataframe(frame: pd.DataFrame, *, hide_index: bool = True, column_config=None):
+    """Render a dataframe with the same compatibility behavior as charts."""
+    kwargs = {"hide_index": hide_index}
+    if column_config is not None:
+        kwargs["column_config"] = column_config
+    kwargs.update(full_width_kwargs(st.dataframe))
+    return st.dataframe(frame, **kwargs)
+
+
+def download_button(label: str, data, *, file_name: str, mime: str):
+    """Render a full-width download button on old and new Streamlit builds."""
+    kwargs = {"file_name": file_name, "mime": mime}
+    kwargs.update(full_width_kwargs(st.download_button))
+    return st.download_button(label, data, **kwargs)
+
+
+def season_label(year: int) -> str:
+    return f"{year - 1}–{str(year)[-2:]}"
+
+
+def nice_model(name: str) -> str:
+    return name.replace("_", " ").replace("-", " ").capitalize()
+
+
+def render_validation(results: dict):
+    st.subheader("Check the model before using the answer")
+    st.write("Probabilities are useful when their confidence agrees with what happened in later games. These are the saved evaluation results for the full eligible dataset; the team filter does not change them.")
+    comparison = pd.DataFrame(results.get("model_comparison", []))
+    calibration = pd.DataFrame(results.get("calibration", []))
+    if comparison.empty:
+        st.info("Model validation results will appear after the analysis build completes.")
+        return
+    seasons = sorted(comparison["season"].unique().tolist(), reverse=True)
+    validation_season = st.selectbox("Evaluation season", seasons, format_func=season_label, key="validation_season")
+    evaluation = comparison.loc[comparison["season"] == validation_season].copy()
+    selected_name = results.get("selected_model", "")
+    selected = evaluation.loc[evaluation["model"] == selected_name]
+    chosen = selected.iloc[0] if len(selected) else evaluation.iloc[0]
+    a, b, c = st.columns(3)
+    a.metric("Brier score · lower is better", f"{chosen['brier']:.4f}")
+    b.metric("Log loss · lower is better", f"{chosen['log_loss']:.4f}")
+    c.metric("Evaluated attempts", f"{int(chosen['n']):,}")
+    chart, explanation = st.columns([1.15, 1], gap="large")
+    with chart:
+        st.markdown("### Probability calibration")
+        cal = calibration.loc[calibration["season"] == validation_season] if "season" in calibration else calibration
+        if not cal.empty:
+            plotly_chart(calibration_figure(cal))
+        else:
+            st.info("No calibration bins available for this season.")
+    with explanation:
+        st.markdown("### How to read this")
+        st.write("A point close to the diagonal means predicted and observed make rates agree. A point below the line means the model was too optimistic in that probability range.")
+        st.write(f"**Selected model:** {nice_model(str(selected_name))}.")
+        st.write("Brier score measures squared probability error. Log loss penalizes confident mistakes more heavily. The simple baselines are the standard the selected model must earn its place against.")
+        st.caption("2022–23 and 2023–24 provide training data; 2024–25 selects the model; 2025–26 is the fixed final evaluation. The saved report documents the freeze and evaluation policy.")
+    table = evaluation.rename(columns={"model": "Model", "n": "Attempts", "brier": "Brier score", "log_loss": "Log loss"})
+    dataframe(table[["Model", "Attempts", "Brier score", "Log loss"]], column_config={"Brier score": st.column_config.NumberColumn(format="%.4f"), "Log loss": st.column_config.NumberColumn(format="%.4f")})
+
+
+def render_methods(results: dict):
+    st.subheader("The evidence behind the explorer")
+    a, b = st.columns(2, gap="large")
+    with a:
+        st.markdown("### What this project answers")
+        st.write("For recorded NCAA Division I men's field-goal attempts, where are make probability and expected points higher, and how do modest changes in the shot mix affect estimated scoring?")
+        st.write("One row represents a recorded field-goal attempt. Expected points equal the predicted make probability multiplied by the attempt's source-reported point value. Free throws and the value of passing are outside this outcome.")
+        st.markdown("### Data and reproducibility")
+        st.write("The NCAA-native shot files are distributed by SportsDataverse. The build preserves raw files, checks duplicates and coordinates, validates Division I membership, and records exclusions. Coverage is conditional on the publisher's available games.")
+        st.markdown("[NCAA shot data](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/ncaa_mbb_shots) · [NCAA rules and court resources](https://www.ncaa.org/sports/2013/12/2/men-s-basketball-rules-of-the-game.aspx)")
+    with b:
+        st.markdown("### Interpreting a scenario")
+        st.write("The scenario redistributes a small share of recorded attempts between five source-defined zones. Zone estimates use the selected sample with a pooled prior; the frozen predictive model and the retrospective scenario answer different questions.")
+        st.write("An estimated gain assumes shooting efficiency stays similar after the mix changes. Defenders, fatigue, play calls, shot availability, and roster changes can all break that assumption. Uncertainty describes the estimate under the model assumptions, not every source of real-world uncertainty.")
+        st.write("The court shows approximately three-foot cells. Prediction maps average frozen model estimates only at observed locations. Low-count cells are blank. The source zones are not inferred from the displayed court lines.")
+    limitations = results.get("limitations", [])
+    if limitations:
+        with st.expander("Study limitations", expanded=True):
+            if isinstance(limitations, list):
+                for item in limitations:
+                    st.write(f"• {item}")
+            else:
+                st.write(limitations)
+    with st.expander("Audit and run details"):
+        st.json({"run_id": results.get("run_id", "unavailable"), "audit": results.get("audit", {})}, expanded=False)
+    st.markdown("### Take the research with you")
+    downloads = st.columns(3)
+    download_button("Download analysis results", json.dumps(results, indent=2, default=str), file_name="ncaa_analysis_results.json", mime="application/json")
+    candidates = [(ROOT / "output/pdf", ".pdf", "application/pdf"), (ROOT / "output/presentation", ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation")]
+    for col, (directory, suffix, mime) in zip(downloads[1:], candidates):
+        files = sorted(directory.glob(f"*{suffix}")) if directory.exists() else []
+        if files:
+            artifact = files[0]
+            download_button("Download research report" if suffix == ".pdf" else "Download presentation", artifact.read_bytes(), file_name=artifact.name, mime=mime)
+        else:
+            col.caption("Research report pending" if suffix == ".pdf" else "Presentation pending")
+
+
+def main():
+    st.markdown('<div class="masthead"><div class="brand"><i>◉</i> CourtSense</div><div class="edition">COLLEGE BASKETBALL / RESEARCH EXPLORER</div></div>', unsafe_allow_html=True)
+    try:
+        results, shots = analysis_data()
+    except (FileNotFoundError, ValueError, KeyError) as exc:
+        st.title("The court is getting ready.")
+        st.info("The explorer needs the completed research snapshot. Run the project's analysis build, then reload this page.")
+        with st.expander("Build details"):
+            st.code(str(exc))
+        st.stop()
+    if shots.empty:
+        st.warning("The research snapshot has no eligible shots. Review the data audit before continuing.")
+        st.stop()
+    with st.sidebar:
+        st.markdown('<p class="eyebrow">Explore the evidence</p>', unsafe_allow_html=True)
+        st.header("Choose your view")
+        seasons = sorted(shots["season"].unique().tolist(), reverse=True)
+        season = st.selectbox("Season", seasons, format_func=season_label, key="season")
+        season_shots = shots.loc[shots["season"] == season]
+        teams = sorted(season_shots["team_name"].dropna().unique().tolist())
+        default_team = next((name for name in teams if "Ohio State" in name), None)
+        team_options = ["All Division I teams", *teams]
+        team = st.selectbox("Team", team_options, index=team_options.index(default_team) if default_team else 0, key="team")
+        team_shots = season_shots if team == team_options[0] else season_shots.loc[season_shots["team_name"] == team]
+        player_table = team_shots[["player_key", "player_name"]].drop_duplicates("player_key").sort_values("player_name")
+        player_names = dict(zip(player_table["player_key"], player_table["player_name"]))
+        player = st.selectbox("Player", ["all", *player_table["player_key"].tolist()], format_func=lambda key: "All players" if key == "all" else str(player_names.get(key, key)), key="player")
+        scope = team_shots if player == "all" else team_shots.loc[team_shots["player_key"] == player]
+        st.divider()
+        cell_minimum = st.slider("Minimum attempts per model-map cell", 1, 30, 5, help="Only the probability and expected-points maps hide cells below this threshold. The frequency map retains all visible attempts.")
+        st.caption("Source seasons use the ending year. This explorer covers men's Division I basketball only.")
+        st.markdown('<div class="note">A shot-quality estimate is evidence for a question, not a guarantee of a better play.</div>', unsafe_allow_html=True)
+    st.markdown('<p class="eyebrow">NCAA DIVISION I · MEN’S BASKETBALL</p>', unsafe_allow_html=True)
+    st.title("Find the value in every zone.")
+    st.markdown('<p class="lead">Explore where teams shoot, how likely those attempts are to fall, and what a carefully constrained change in shot mix could mean.</p>', unsafe_allow_html=True)
+    label = team if player == "all" else f"{player_names[player]} · {team}"
+    st.markdown(f'<p class="scope-line">{escape(label)} &nbsp; / &nbsp; {season_label(season)}</p>', unsafe_allow_html=True)
+    if scope.empty:
+        st.info("No attempts match this selection. Choose another team or player.")
+        st.stop()
+    summary = scope_summary(scope)
+    cards = st.columns(5)
+    cards[0].metric("Recorded attempts", f"{summary['count']:,}", help=f"Across {summary['games']:,} distinct games in the available source.")
+    cards[1].metric("Games represented", f"{summary['games']:,}")
+    cards[2].metric("Observed field-goal %", f"{summary['fg_pct']:.1%}")
+    cards[3].metric("Observed points / attempt", f"{summary['observed_pps']:.3f}")
+    cards[4].metric("Predicted points / attempt", f"{summary['expected_pps']:.3f}")
+    if summary["count"] < 100:
+        st.warning("Small sample: fewer than 100 recorded attempts. Treat maps and zone estimates as exploratory; a few shots can change them substantially.")
+    court_tab, scenario_tab, validation_tab, methods_tab = st.tabs(["Court explorer", "Shot-mix scenarios", "Model validation", "Methods & downloads"])
+    with court_tab:
+        st.subheader("One court. Three ways to read it.")
+        st.caption("Every cell is grounded in recorded attempts. Hover for the cell's count; empty cells have no eligible support.")
+        bins = court_bins(scope)
+        columns = st.columns(3, gap="medium")
+        for column, kind, title, subtitle in zip(columns, ["count", "probability", "points"], ["01 / Where shots happen", "02 / How often they fall", "03 / What they are worth"], ["Recorded attempt frequency", "Average predicted make probability", "Average predicted points per attempt"]):
+            with column:
+                st.markdown(f"### {title}")
+                st.caption(subtitle)
+                plotly_chart(court_heatmap(bins, kind, cell_minimum), key=f"court_{kind}")
+        st.caption(f"{bins['visible']:,} attempts within the displayed half-court. {bins['outside']:,} attempts outside this view remain in totals and analysis. Probability maps require at least {cell_minimum} attempts per cell.")
+        st.markdown("### The zone breakdown")
+        zone_table = summary["zone_table"].copy()
+        if "zone" in zone_table:
+            zone_table["zone"] = zone_table["zone"].map(ZONE_NAMES).fillna(zone_table["zone"])
+        elif "shot_zone" in zone_table:
+            zone_table["shot_zone"] = zone_table["shot_zone"].map(ZONE_NAMES).fillna(zone_table["shot_zone"])
+        dataframe(zone_table)
+        download_button("Download selected zone summary", csv_bytes(zone_table), file_name=f"ncaa_{season}_zone_summary.csv", mime="text/csv")
+    with scenario_tab:
+        st.subheader("Change the mix. Keep the assumptions visible.")
+        st.write("Explore modest changes in the selected sample's zone shares. The estimates below use observed zone results with shrinkage and uncertainty; they are retrospective scenarios.")
+        if summary["count"] < 100:
+            st.info("At least 100 attempts are required for a shot-mix scenario. Broaden the selection to a team or all players.")
+        else:
+            control1, control2, control3, control4 = st.columns(4)
+            max_shift = control1.slider("Maximum shift per zone", 0, 15, 5, 1, format="%d pp", help="The maximum percentage-point increase or decrease in one zone's share.") / 100
+            budget = control2.slider("Total mix movement", 0, 40, 20, 2, format="%d pp", help="Sum of absolute changes across zones. Moving 5 percentage points from one zone to another uses 10 points of movement.") / 100
+            three_cap = control3.slider("Three-point share cap", 20, 100, 60, 5, format="%d%%") / 100
+            risk = control4.slider("Uncertainty penalty", 0.0, 2.0, 1.0, .25, help="Higher values favor zones with more certain expected-point estimates. This is a sensitivity control, not a confidence level.")
+            scenario = scenario_data(scope, max_shift, budget, three_cap, risk)
+            if not scenario.get("feasible", False):
+                st.warning(scenario.get("message", "These constraints are infeasible. Increase the three-point cap or allow more movement."))
+            else:
+                x, y, z = st.columns(3)
+                x.metric("Current mix · estimated pts / attempt", f"{scenario['current_ep']:.3f}")
+                y.metric("Scenario mix · estimated pts / attempt", f"{scenario['recommended_ep']:.3f}")
+                z.metric("Estimated change / 100 attempts", f"{scenario['gain_per100']:+.1f}")
+                st.markdown(f'<div class="note">Conditional 95% interval for the change: <b>{scenario["gain_low"]:+.1f} to {scenario["gain_high"]:+.1f} points per 100 attempts</b>. This assumes the estimated zone efficiencies persist after the mix changes. It does not establish a causal improvement.</div>', unsafe_allow_html=True)
+                left, right = st.columns([1.1, 1], gap="large")
+                with left:
+                    plotly_chart(mix_figure(scenario["table"]))
+                with right:
+                    st.markdown("### Read the recommendation")
+                    deltas = scenario["table"].assign(change=lambda t: t.recommended_share - t.current_share)
+                    changed = deltas.loc[deltas.change.abs() >= .001].sort_values("change", ascending=False)
+                    if changed.empty:
+                        st.write("The constraints and evidence support retaining the current mix.")
+                    else:
+                        for row in changed.itertuples():
+                            verb = "Increase" if row.change > 0 else "Reduce"
+                            st.write(f"{verb} **{ZONE_NAMES.get(row.zone, row.zone).lower()}** by **{abs(row.change) * 100:.1f} percentage points**.")
+                    st.caption("Zones with insufficient evidence are kept near their recorded shares. Availability of new shot opportunities is not observed.")
+                    if scenario.get("message"):
+                        st.caption(scenario["message"])
+                with st.expander("Zone estimates and scenario table"):
+                    dataframe(scenario["table"])
+                download_button("Download scenario table", csv_bytes(scenario["table"]), file_name=f"ncaa_{season}_scenario.csv", mime="text/csv")
+    with validation_tab:
+        render_validation(results)
+    with methods_tab:
+        render_methods(results)
+    st.markdown(f'<div class="footer">CourtSense · NCAA men’s basketball research · Run {escape(str(results.get("run_id", "unavailable")))} · Academic study & portfolio explorer</div>', unsafe_allow_html=True)
+
+
+if __name__ == "__main__":
+    main()

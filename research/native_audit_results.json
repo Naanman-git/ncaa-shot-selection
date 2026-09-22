@@ -1,0 +1,160 @@
+{
+  "source": "SportsDataverse ncaa_mbb_shots",
+  "source_documentation": "https://github.com/sportsdataverse/hoopR/blob/main/R/load_ncaa_mbb.R",
+  "seasons": [
+    {
+      "season": 2023,
+      "rows": 702760,
+      "games": 6129,
+      "teams": 704,
+      "shooters": 8335,
+      "make_rate": 0.43935482952928456,
+      "three_point_share": 0.3785260971028516,
+      "coordinate_rows": 702760,
+      "zones": {
+        "paint": 210459,
+        "abovebreak3": 205247,
+        "rim": 176081,
+        "corner3": 60766,
+        "mid": 50207
+      },
+      "team_rows": {
+        "count": 704.0,
+        "mean": 998.2386363636364,
+        "std": 896.3675137147085,
+        "min": 38.0,
+        "25%": 64.0,
+        "50%": 1537.5,
+        "75%": 1851.25,
+        "max": 2305.0
+      }
+    },
+    {
+      "season": 2024,
+      "rows": 724243,
+      "games": 6204,
+      "teams": 716,
+      "shooters": 8532,
+      "make_rate": 0.4397695248694154,
+      "three_point_share": 0.37748518107872636,
+      "coordinate_rows": 724243,
+      "zones": {
+        "paint": 216977,
+        "abovebreak3": 210944,
+        "rim": 185235,
+        "corner3": 62447,
+        "mid": 48640
+      },
+      "team_rows": {
+        "count": 716.0,
+        "mean": 1011.5125698324023,
+        "std": 923.8581104441238,
+        "min": 41.0,
+        "25%": 65.0,
+        "50%": 1460.5,
+        "75%": 1905.0,
+        "max": 2472.0
+      }
+    },
+    {
+      "season": 2025,
+      "rows": 730963,
+      "games": 6291,
+      "teams": 700,
+      "shooters": 8471,
+      "make_rate": 0.44087183619417125,
+      "three_point_share": 0.39405688112804615,
+      "coordinate_rows": 730963,
+      "zones": {
+        "abovebreak3": 221741,
+        "paint": 211182,
+        "rim": 189592,
+        "corner3": 66300,
+        "mid": 42148
+      },
+      "team_rows": {
+        "count": 700.0,
+        "mean": 1044.2328571428573,
+        "std": 921.9053751916603,
+        "min": 39.0,
+        "25%": 66.0,
+        "50%": 1667.0,
+        "75%": 1921.0,
+        "max": 2491.0
+      }
+    }
+  ],
+  "cleaning": {
+    "rows_before": 2173524,
+    "exact_duplicate_rows_removed": 15558,
+    "rows_after_exact_deduplication": 2157966,
+    "rows_excluded_from_model": 0,
+    "rows_in_model": 2157966,
+    "excluded_by_missing_or_invalid_field": {
+      "point_value": 0,
+      "made": 0,
+      "shot_zone": 0,
+      "contest_id": 0,
+      "team_id": 0,
+      "shooter_id": 0,
+      "coordinates_or_distance": 0
+    },
+    "seasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "zones": {
+      "paint": 638618,
+      "abovebreak3": 637932,
+      "rim": 550908,
+      "corner3": 189513,
+      "mid": 140995
+    }
+  },
+  "missingness_after_cleaning": {
+    "season": 0,
+    "team_id": 0,
+    "shooter_id": 0,
+    "shot_x": 0,
+    "shot_y": 0,
+    "dist_ft": 0,
+    "shot_zone": 0,
+    "made": 0,
+    "point_value": 0,
+    "contest_id": 0,
+    "ncaa_team_id": 111765,
+    "espn_team_id": 111765,
+    "shooter_player_id": 124015,
+    "shooter_clean_name": 124015,
+    "espn_game_id": 1359,
+    "source_file": 0,
+    "expected_value_if_made": 0,
+    "shot_uid": 0
+  },
+  "source_files": [
+    {
+      "file": "data/raw/ncaa_mbb_shots_2023.parquet",
+      "bytes": 8991742,
+      "sha256": "b5065e503e6d567cf51b9071f6b03733ed861ff591b4c8290e87d0f83d40ed0f",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/ncaa_mbb_shots/ncaa_mbb_shots_2023.parquet"
+    },
+    {
+      "file": "data/raw/ncaa_mbb_shots_2024.parquet",
+      "bytes": 9153055,
+      "sha256": "20764cf841723a25a88e2a7f369be0c8f5a3d54cae77978355f24969efaaa65f",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/ncaa_mbb_shots/ncaa_mbb_shots_2024.parquet"
+    },
+    {
+      "file": "data/raw/ncaa_mbb_shots_2025.parquet",
+      "bytes": 8806252,
+      "sha256": "3ea35a75bd4beebb53803880dd2e0519d073797bfb1a6e5ec00a1734157994b0",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/ncaa_mbb_shots/ncaa_mbb_shots_2025.parquet"
+    }
+  ],
+  "limitations": [
+    "The source shot table has no complete season-type field; regular-season filtering needs a documented crosswalk.",
+    "The source has no defender distance, shot-clock time, or shot-mechanism feature.",
+    "Exact duplicate rows are removed; near-identical shots are retained because they can represent real attempts."
+  ]
+}

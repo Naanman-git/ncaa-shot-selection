@@ -1,0 +1,15 @@
+{
+  "protocol_version": "1.0",
+  "training_seasons": [2023, 2024],
+  "selection_season": 2025,
+  "final_test_season": 2026,
+  "candidates": ["Global rate", "Zone shrinkage", "Spatial logistic", "Spatial + player history"],
+  "selection_metric": "log_loss",
+  "history_prior_attempts": 30,
+  "zone_prior_attempts": 30,
+  "bootstrap_repeats": 500,
+  "seed": 42,
+  "case_study_team": "Ohio State Buckeyes",
+  "scenario": {"max_shift": 0.05, "budget": 0.20, "three_cap": 0.60, "risk": 1.0},
+  "notes": "Protocol fixed before inspecting 2026 model outcomes. Earlier exploratory 2025 results are superseded. Selection minimizes 2025 log loss; no refit on 2025. Player history updates only from earlier dates within the same season."
+}

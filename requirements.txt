@@ -1,0 +1,10 @@
+# Runtime dependencies for the Streamlit dashboard and its shared analysis API.
+# Keep this file at repository root: Streamlit Community Cloud discovers it
+# automatically when the app is deployed from GitHub.
+numpy>=1.26,<3
+pandas>=2.1,<4
+pyarrow>=14,<26
+scipy>=1.11,<2
+scikit-learn>=1.4,<2
+plotly>=5.20,<8
+streamlit==1.64.0

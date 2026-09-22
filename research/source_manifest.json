@@ -1,0 +1,47 @@
+{
+  "recorded_utc": "2026-09-21T03:38:45.440631+00:00",
+  "files": [
+    {
+      "file": "data/raw/play_by_play_2024.parquet",
+      "bytes": 54109384,
+      "sha256": "fd876828d193bd681f54c78accccd84186d90954a8742d93a5ab9867e5c1e6e3",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_mens_college_basketball_pbp/play_by_play_2024.parquet"
+    },
+    {
+      "file": "data/raw/shots_2023.parquet",
+      "bytes": 8794937,
+      "sha256": "cd00eeb12e4cb6cd5db5d609da530674bc80e33c1ff21e3c4da3da8f95b44850",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_mens_college_basketball_shots/shots_2023.parquet"
+    },
+    {
+      "file": "data/raw/shots_2024.parquet",
+      "bytes": 8890195,
+      "sha256": "1ac1852ad18c0ab1bdbad96b42cf6c3ab5d14f576bce88951b7ce4daf7b87562",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_mens_college_basketball_shots/shots_2024.parquet"
+    },
+    {
+      "file": "data/raw/shots_2025.parquet",
+      "bytes": 9584753,
+      "sha256": "051eca79a44afa26a40d5c2d946ee528aacde4d9d3a3a55936f0267f9e6a1ac6",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_mens_college_basketball_shots/shots_2025.parquet"
+    },
+    {
+      "file": "data/raw/team_box_2023.parquet",
+      "bytes": 762833,
+      "sha256": "2dc03013ed57653e7063134bfc6af0cd96866cb25c11268288828ff42757a84c",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_mens_college_basketball_team_boxscores/team_box_2023.parquet"
+    },
+    {
+      "file": "data/raw/team_box_2024.parquet",
+      "bytes": 798459,
+      "sha256": "b9137f1cb2b8bc94836c63842de8c587df197bf7bd7746727593e1301a819b2d",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_mens_college_basketball_team_boxscores/team_box_2024.parquet"
+    },
+    {
+      "file": "data/raw/team_box_2025.parquet",
+      "bytes": 711263,
+      "sha256": "571f7ab5c4dd5c4332544f27a0e9d32d131f6f20c4527884a7e180084ae887c9",
+      "url": "https://github.com/sportsdataverse/sportsdataverse-data/releases/download/espn_mens_college_basketball_team_boxscores/team_box_2025.parquet"
+    }
+  ]
+}

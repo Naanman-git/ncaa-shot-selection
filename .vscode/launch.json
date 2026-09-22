@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "CourtSense: Streamlit dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "${workspaceFolder}/app.py",
+        "--server.headless=true"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src",
+        "STREAMLIT_GLOBAL_DEVELOPMENT_MODE": "false"
+      },
+      "justMyCode": true
+    },
+    {
+      "name": "CourtSense: pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q", "tests"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+      "justMyCode": false
+    }
+  ]
+}

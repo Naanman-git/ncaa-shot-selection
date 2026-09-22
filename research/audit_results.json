@@ -1,0 +1,839 @@
+{
+  "created_utc": "2026-09-21T03:38:45.440631+00:00",
+  "seasons": [
+    {
+      "season_ending_year": 2023,
+      "all_shot_rows": 920595,
+      "shot_games": 6116,
+      "shot_teams": 698,
+      "free_throw_rows": 218846,
+      "ambiguous_fg_type_value_rows": 55,
+      "candidate_field_goal_rows": 701625,
+      "candidate_fg_games": 6116,
+      "missing_shooter_rows": 14,
+      "missing_xy_rows": 639406,
+      "has_xy_rows": 62219,
+      "bounded_xy_rows": 62219,
+      "bounded_xy_fraction": 0.08867842508462498,
+      "sentinel_xy_rows": 0,
+      "other_out_of_bounds_xy_rows": 0,
+      "exact_duplicate_compact_rows": 61894,
+      "box_team_games": 12440,
+      "box_games": 6220,
+      "fg_team_games": 12232,
+      "fg_team_games_with_box": 12230,
+      "team_games_reconciling_all_four_totals": 9894,
+      "games_with_two_teams_reconciled_and_95pct_xy_each": 505,
+      "candidate_fg_in_those_games": 58578,
+      "candidate_teams_at_least_10_games": 38,
+      "location_by_shot_type": [
+        {
+          "type_value": "DunkShot_2",
+          "attempts": 24963,
+          "located": 2657,
+          "fraction": 0.10643752754076033
+        },
+        {
+          "type_value": "JumpShot_2",
+          "attempts": 185124,
+          "located": 18206,
+          "fraction": 0.09834489315269765
+        },
+        {
+          "type_value": "JumpShot_3",
+          "attempts": 264847,
+          "located": 22614,
+          "fraction": 0.08538514689613248
+        },
+        {
+          "type_value": "LayUpShot_2",
+          "attempts": 225498,
+          "located": 17695,
+          "fraction": 0.07847076249013295
+        },
+        {
+          "type_value": "TipShot_2",
+          "attempts": 1193,
+          "located": 1047,
+          "fraction": 0.8776194467728415
+        }
+      ],
+      "location_by_outcome": [
+        {
+          "made": 0,
+          "count": 392346,
+          "mean": 0.08922991441227895
+        },
+        {
+          "made": 1,
+          "count": 309279,
+          "mean": 0.08797881524448799
+        }
+      ],
+      "box_season_types": {
+        "2": 12214,
+        "3": 226
+      },
+      "top_coverage_teams": [
+        {
+          "team_id": 2305,
+          "team_name": "Kansas",
+          "attempts": 2133,
+          "bounded_locations": 1614,
+          "games": 36,
+          "location_fraction": 0.7566807313642757,
+          "candidate_games": 27
+        },
+        {
+          "team_id": 248,
+          "team_name": "Houston",
+          "attempts": 2202,
+          "bounded_locations": 1533,
+          "games": 37,
+          "location_fraction": 0.6961852861035422,
+          "candidate_games": 24
+        },
+        {
+          "team_id": 333,
+          "team_name": "Alabama",
+          "attempts": 2312,
+          "bounded_locations": 1557,
+          "games": 37,
+          "location_fraction": 0.6734429065743944,
+          "candidate_games": 23
+        },
+        {
+          "team_id": 150,
+          "team_name": "Duke",
+          "attempts": 2064,
+          "bounded_locations": 1379,
+          "games": 36,
+          "location_fraction": 0.6681201550387597,
+          "candidate_games": 23
+        },
+        {
+          "team_id": 153,
+          "team_name": "North Carolina",
+          "attempts": 1984,
+          "bounded_locations": 1490,
+          "games": 33,
+          "location_fraction": 0.751008064516129,
+          "candidate_games": 23
+        },
+        {
+          "team_id": 8,
+          "team_name": "Arkansas",
+          "attempts": 2059,
+          "bounded_locations": 1207,
+          "games": 36,
+          "location_fraction": 0.5862068965517241,
+          "candidate_games": 21
+        },
+        {
+          "team_id": 251,
+          "team_name": "Texas",
+          "attempts": 2279,
+          "bounded_locations": 1383,
+          "games": 38,
+          "location_fraction": 0.6068451075032909,
+          "candidate_games": 19
+        },
+        {
+          "team_id": 41,
+          "team_name": "UConn",
+          "attempts": 2265,
+          "bounded_locations": 1123,
+          "games": 38,
+          "location_fraction": 0.4958057395143488,
+          "candidate_games": 19
+        },
+        {
+          "team_id": 2250,
+          "team_name": "Gonzaga",
+          "attempts": 2254,
+          "bounded_locations": 1328,
+          "games": 37,
+          "location_fraction": 0.5891748003549245,
+          "candidate_games": 19
+        },
+        {
+          "team_id": 96,
+          "team_name": "Kentucky",
+          "attempts": 2045,
+          "bounded_locations": 1234,
+          "games": 34,
+          "location_fraction": 0.6034229828850856,
+          "candidate_games": 19
+        },
+        {
+          "team_id": 239,
+          "team_name": "Baylor",
+          "attempts": 1957,
+          "bounded_locations": 1082,
+          "games": 34,
+          "location_fraction": 0.5528870720490546,
+          "candidate_games": 18
+        },
+        {
+          "team_id": 26,
+          "team_name": "UCLA",
+          "attempts": 2246,
+          "bounded_locations": 1039,
+          "games": 37,
+          "location_fraction": 0.46260017809439,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 2390,
+          "team_name": "Miami",
+          "attempts": 2196,
+          "bounded_locations": 1007,
+          "games": 37,
+          "location_fraction": 0.45856102003642984,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 2633,
+          "team_name": "Tennessee",
+          "attempts": 2079,
+          "bounded_locations": 1096,
+          "games": 36,
+          "location_fraction": 0.5271765271765272,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 2509,
+          "team_name": "Purdue",
+          "attempts": 1921,
+          "bounded_locations": 983,
+          "games": 35,
+          "location_fraction": 0.5117126496616345,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 66,
+          "team_name": "Iowa State",
+          "attempts": 1867,
+          "bounded_locations": 950,
+          "games": 33,
+          "location_fraction": 0.5088377075522228,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 12,
+          "team_name": "Arizona",
+          "attempts": 2061,
+          "bounded_locations": 981,
+          "games": 35,
+          "location_fraction": 0.4759825327510917,
+          "candidate_games": 16
+        },
+        {
+          "team_id": 258,
+          "team_name": "Virginia",
+          "attempts": 1763,
+          "bounded_locations": 903,
+          "games": 33,
+          "location_fraction": 0.5121951219512195,
+          "candidate_games": 16
+        },
+        {
+          "team_id": 2628,
+          "team_name": "TCU",
+          "attempts": 2113,
+          "bounded_locations": 929,
+          "games": 35,
+          "location_fraction": 0.43965925224798863,
+          "candidate_games": 15
+        },
+        {
+          "team_id": 2306,
+          "team_name": "Kansas State",
+          "attempts": 2080,
+          "bounded_locations": 847,
+          "games": 36,
+          "location_fraction": 0.40721153846153846,
+          "candidate_games": 15
+        }
+      ],
+      "ohio_state": [
+        {
+          "team_id": 194,
+          "team_name": "Ohio State",
+          "attempts": 2042,
+          "bounded_locations": 803,
+          "games": 35,
+          "location_fraction": 0.3932419196865818,
+          "candidate_games": 14
+        }
+      ],
+      "note": "Candidate field goals before event-ID checks, season-specific D1 membership, geometry certification, and regular-season filtering. Broad coordinate bounds are a diagnostic, not final inclusion rules."
+    },
+    {
+      "season_ending_year": 2024,
+      "all_shot_rows": 957173,
+      "shot_games": 6151,
+      "shot_teams": 713,
+      "free_throw_rows": 233110,
+      "ambiguous_fg_type_value_rows": 3939,
+      "candidate_field_goal_rows": 720124,
+      "candidate_fg_games": 6151,
+      "missing_shooter_rows": 58,
+      "missing_xy_rows": 674633,
+      "has_xy_rows": 45491,
+      "bounded_xy_rows": 45491,
+      "bounded_xy_fraction": 0.06317106498325288,
+      "sentinel_xy_rows": 0,
+      "other_out_of_bounds_xy_rows": 0,
+      "exact_duplicate_compact_rows": 66258,
+      "box_team_games": 12480,
+      "box_games": 6240,
+      "fg_team_games": 12303,
+      "fg_team_games_with_box": 12298,
+      "team_games_reconciling_all_four_totals": 10345,
+      "games_with_two_teams_reconciled_and_95pct_xy_each": 358,
+      "candidate_fg_in_those_games": 42426,
+      "candidate_teams_at_least_10_games": 22,
+      "location_by_shot_type": [
+        {
+          "type_value": "DunkShot_2",
+          "attempts": 25303,
+          "located": 2044,
+          "fraction": 0.08078093506698811
+        },
+        {
+          "type_value": "JumpShot_2",
+          "attempts": 186349,
+          "located": 12242,
+          "fraction": 0.06569393986552115
+        },
+        {
+          "type_value": "JumpShot_3",
+          "attempts": 270777,
+          "located": 17076,
+          "fraction": 0.06306296325020219
+        },
+        {
+          "type_value": "LayUpShot_2",
+          "attempts": 236934,
+          "located": 13435,
+          "fraction": 0.05670355457637992
+        },
+        {
+          "type_value": "TipShot_2",
+          "attempts": 761,
+          "located": 694,
+          "fraction": 0.911957950065703
+        }
+      ],
+      "location_by_outcome": [
+        {
+          "made": 0,
+          "count": 402102,
+          "mean": 0.0633968495555854
+        },
+        {
+          "made": 1,
+          "count": 318022,
+          "mean": 0.06288558653174937
+        }
+      ],
+      "box_season_types": {
+        "2": 12240,
+        "3": 240
+      },
+      "top_coverage_teams": [
+        {
+          "team_id": 153,
+          "team_name": "North Carolina",
+          "attempts": 2307,
+          "bounded_locations": 1387,
+          "games": 37,
+          "location_fraction": 0.6012136974425661,
+          "candidate_games": 21
+        },
+        {
+          "team_id": 2305,
+          "team_name": "Kansas",
+          "attempts": 1948,
+          "bounded_locations": 1079,
+          "games": 34,
+          "location_fraction": 0.5539014373716632,
+          "candidate_games": 19
+        },
+        {
+          "team_id": 150,
+          "team_name": "Duke",
+          "attempts": 2107,
+          "bounded_locations": 1165,
+          "games": 36,
+          "location_fraction": 0.5529188419553868,
+          "candidate_games": 18
+        },
+        {
+          "team_id": 333,
+          "team_name": "Alabama",
+          "attempts": 2380,
+          "bounded_locations": 1110,
+          "games": 37,
+          "location_fraction": 0.46638655462184875,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 41,
+          "team_name": "UConn",
+          "attempts": 2367,
+          "bounded_locations": 1109,
+          "games": 40,
+          "location_fraction": 0.46852555978031263,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 2509,
+          "team_name": "Purdue",
+          "attempts": 2252,
+          "bounded_locations": 919,
+          "games": 39,
+          "location_fraction": 0.4080817051509769,
+          "candidate_games": 16
+        },
+        {
+          "team_id": 248,
+          "team_name": "Houston",
+          "attempts": 2222,
+          "bounded_locations": 937,
+          "games": 37,
+          "location_fraction": 0.4216921692169217,
+          "candidate_games": 16
+        },
+        {
+          "team_id": 152,
+          "team_name": "NC State",
+          "attempts": 2449,
+          "bounded_locations": 939,
+          "games": 41,
+          "location_fraction": 0.3834218048182932,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 2633,
+          "team_name": "Tennessee",
+          "attempts": 2210,
+          "bounded_locations": 952,
+          "games": 36,
+          "location_fraction": 0.4307692307692308,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 96,
+          "team_name": "Kentucky",
+          "attempts": 2127,
+          "bounded_locations": 995,
+          "games": 33,
+          "location_fraction": 0.4677950164551011,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 239,
+          "team_name": "Baylor",
+          "attempts": 1993,
+          "bounded_locations": 862,
+          "games": 35,
+          "location_fraction": 0.4325137982940291,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 12,
+          "team_name": "Arizona",
+          "attempts": 2303,
+          "bounded_locations": 828,
+          "games": 36,
+          "location_fraction": 0.35953104646113765,
+          "candidate_games": 12
+        },
+        {
+          "team_id": 356,
+          "team_name": "Illinois",
+          "attempts": 2347,
+          "bounded_locations": 608,
+          "games": 38,
+          "location_fraction": 0.2590541116318705,
+          "candidate_games": 10
+        },
+        {
+          "team_id": 269,
+          "team_name": "Marquette",
+          "attempts": 2225,
+          "bounded_locations": 602,
+          "games": 37,
+          "location_fraction": 0.270561797752809,
+          "candidate_games": 10
+        },
+        {
+          "team_id": 66,
+          "team_name": "Iowa State",
+          "attempts": 2162,
+          "bounded_locations": 563,
+          "games": 37,
+          "location_fraction": 0.26040703052728953,
+          "candidate_games": 10
+        },
+        {
+          "team_id": 38,
+          "team_name": "Colorado",
+          "attempts": 2121,
+          "bounded_locations": 609,
+          "games": 37,
+          "location_fraction": 0.2871287128712871,
+          "candidate_games": 10
+        },
+        {
+          "team_id": 2,
+          "team_name": "Auburn",
+          "attempts": 2118,
+          "bounded_locations": 729,
+          "games": 35,
+          "location_fraction": 0.34419263456090654,
+          "candidate_games": 10
+        },
+        {
+          "team_id": 2250,
+          "team_name": "Gonzaga",
+          "attempts": 2089,
+          "bounded_locations": 590,
+          "games": 34,
+          "location_fraction": 0.28243178554332216,
+          "candidate_games": 10
+        },
+        {
+          "team_id": 2628,
+          "team_name": "TCU",
+          "attempts": 2072,
+          "bounded_locations": 590,
+          "games": 34,
+          "location_fraction": 0.28474903474903474,
+          "candidate_games": 10
+        },
+        {
+          "team_id": 2226,
+          "team_name": "Florida Atlantic",
+          "attempts": 1993,
+          "bounded_locations": 732,
+          "games": 33,
+          "location_fraction": 0.36728549924736575,
+          "candidate_games": 10
+        }
+      ],
+      "ohio_state": [
+        {
+          "team_id": 194,
+          "team_name": "Ohio State",
+          "attempts": 2104,
+          "bounded_locations": 252,
+          "games": 36,
+          "location_fraction": 0.11977186311787072,
+          "candidate_games": 4
+        }
+      ],
+      "note": "Candidate field goals before event-ID checks, season-specific D1 membership, geometry certification, and regular-season filtering. Broad coordinate bounds are a diagnostic, not final inclusion rules."
+    },
+    {
+      "season_ending_year": 2025,
+      "all_shot_rows": 936510,
+      "shot_games": 6136,
+      "shot_teams": 683,
+      "free_throw_rows": 219972,
+      "ambiguous_fg_type_value_rows": 2573,
+      "candidate_field_goal_rows": 713965,
+      "candidate_fg_games": 6136,
+      "missing_shooter_rows": 87,
+      "missing_xy_rows": 521565,
+      "has_xy_rows": 192400,
+      "bounded_xy_rows": 192400,
+      "bounded_xy_fraction": 0.26948099696763844,
+      "sentinel_xy_rows": 0,
+      "other_out_of_bounds_xy_rows": 0,
+      "exact_duplicate_compact_rows": 62947,
+      "box_team_games": 12572,
+      "box_games": 6286,
+      "fg_team_games": 12272,
+      "fg_team_games_with_box": 12266,
+      "team_games_reconciling_all_four_totals": 10585,
+      "games_with_two_teams_reconciled_and_95pct_xy_each": 1509,
+      "candidate_fg_in_those_games": 175082,
+      "candidate_teams_at_least_10_games": 82,
+      "location_by_shot_type": [
+        {
+          "type_value": "DunkShot_2",
+          "attempts": 24468,
+          "located": 6751,
+          "fraction": 0.27591139447441554
+        },
+        {
+          "type_value": "JumpShot_2",
+          "attempts": 179096,
+          "located": 45743,
+          "fraction": 0.2554105060972886
+        },
+        {
+          "type_value": "JumpShot_3",
+          "attempts": 280507,
+          "located": 74828,
+          "fraction": 0.2667598313054576
+        },
+        {
+          "type_value": "LayUpShot_2",
+          "attempts": 220717,
+          "located": 60299,
+          "fraction": 0.273195993058985
+        },
+        {
+          "type_value": "TipShot_2",
+          "attempts": 9177,
+          "located": 4779,
+          "fraction": 0.5207584177835894
+        }
+      ],
+      "location_by_outcome": [
+        {
+          "made": 0,
+          "count": 397844,
+          "mean": 0.26907280240496273
+        },
+        {
+          "made": 1,
+          "count": 316121,
+          "mean": 0.26999471721271284
+        }
+      ],
+      "box_season_types": {
+        "2": 12326,
+        "3": 246
+      },
+      "top_coverage_teams": [
+        {
+          "team_id": 57,
+          "team_name": "Florida",
+          "attempts": 2432,
+          "bounded_locations": 1205,
+          "games": 39,
+          "location_fraction": 0.4954769736842105,
+          "candidate_games": 19
+        },
+        {
+          "team_id": 150,
+          "team_name": "Duke",
+          "attempts": 2278,
+          "bounded_locations": 1226,
+          "games": 39,
+          "location_fraction": 0.5381913959613697,
+          "candidate_games": 18
+        },
+        {
+          "team_id": 248,
+          "team_name": "Houston",
+          "attempts": 2372,
+          "bounded_locations": 1005,
+          "games": 40,
+          "location_fraction": 0.4236930860033727,
+          "candidate_games": 17
+        },
+        {
+          "team_id": 2,
+          "team_name": "Auburn",
+          "attempts": 2333,
+          "bounded_locations": 1025,
+          "games": 38,
+          "location_fraction": 0.43934847835405055,
+          "candidate_games": 16
+        },
+        {
+          "team_id": 333,
+          "team_name": "Alabama",
+          "attempts": 2371,
+          "bounded_locations": 972,
+          "games": 37,
+          "location_fraction": 0.40995360607338677,
+          "candidate_games": 15
+        },
+        {
+          "team_id": 8,
+          "team_name": "Arkansas",
+          "attempts": 2110,
+          "bounded_locations": 859,
+          "games": 36,
+          "location_fraction": 0.4071090047393365,
+          "candidate_games": 15
+        },
+        {
+          "team_id": 145,
+          "team_name": "Ole Miss",
+          "attempts": 2097,
+          "bounded_locations": 951,
+          "games": 35,
+          "location_fraction": 0.45350500715307585,
+          "candidate_games": 15
+        },
+        {
+          "team_id": 96,
+          "team_name": "Kentucky",
+          "attempts": 2082,
+          "bounded_locations": 923,
+          "games": 34,
+          "location_fraction": 0.44332372718539864,
+          "candidate_games": 15
+        },
+        {
+          "team_id": 2633,
+          "team_name": "Tennessee",
+          "attempts": 2074,
+          "bounded_locations": 989,
+          "games": 37,
+          "location_fraction": 0.4768563162970106,
+          "candidate_games": 15
+        },
+        {
+          "team_id": 2116,
+          "team_name": "UCF",
+          "attempts": 2325,
+          "bounded_locations": 885,
+          "games": 37,
+          "location_fraction": 0.38064516129032255,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 2641,
+          "team_name": "Texas Tech",
+          "attempts": 2260,
+          "bounded_locations": 949,
+          "games": 37,
+          "location_fraction": 0.41991150442477876,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 300,
+          "team_name": "UC Irvine",
+          "attempts": 2158,
+          "bounded_locations": 802,
+          "games": 38,
+          "location_fraction": 0.3716404077849861,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 127,
+          "team_name": "Michigan State",
+          "attempts": 2125,
+          "bounded_locations": 883,
+          "games": 36,
+          "location_fraction": 0.41552941176470587,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 130,
+          "team_name": "Michigan",
+          "attempts": 2096,
+          "bounded_locations": 828,
+          "games": 36,
+          "location_fraction": 0.3950381679389313,
+          "candidate_games": 14
+        },
+        {
+          "team_id": 12,
+          "team_name": "Arizona",
+          "attempts": 2255,
+          "bounded_locations": 850,
+          "games": 37,
+          "location_fraction": 0.376940133037694,
+          "candidate_games": 13
+        },
+        {
+          "team_id": 236,
+          "team_name": "Chattanooga",
+          "attempts": 2236,
+          "bounded_locations": 777,
+          "games": 38,
+          "location_fraction": 0.34749552772808584,
+          "candidate_games": 13
+        },
+        {
+          "team_id": 153,
+          "team_name": "North Carolina",
+          "attempts": 2224,
+          "bounded_locations": 814,
+          "games": 37,
+          "location_fraction": 0.3660071942446043,
+          "candidate_games": 13
+        },
+        {
+          "team_id": 275,
+          "team_name": "Wisconsin",
+          "attempts": 2177,
+          "bounded_locations": 787,
+          "games": 37,
+          "location_fraction": 0.3615066605420303,
+          "candidate_games": 13
+        },
+        {
+          "team_id": 66,
+          "team_name": "Iowa State",
+          "attempts": 2033,
+          "bounded_locations": 791,
+          "games": 35,
+          "location_fraction": 0.3890801770782095,
+          "candidate_games": 13
+        },
+        {
+          "team_id": 245,
+          "team_name": "Texas A&M",
+          "attempts": 1997,
+          "bounded_locations": 803,
+          "games": 33,
+          "location_fraction": 0.4021031547320981,
+          "candidate_games": 13
+        }
+      ],
+      "ohio_state": [
+        {
+          "team_id": 194,
+          "team_name": "Ohio State",
+          "attempts": 1881,
+          "bounded_locations": 463,
+          "games": 32,
+          "location_fraction": 0.24614566719829878,
+          "candidate_games": 8
+        }
+      ],
+      "note": "Candidate field goals before event-ID checks, season-specific D1 membership, geometry certification, and regular-season filtering. Broad coordinate bounds are a diagnostic, not final inclusion rules."
+    }
+  ],
+  "play_by_play_audit": {
+    "season": 2024,
+    "all_events": 2004997,
+    "shot_events": 957173,
+    "candidate_fg_events": 720124,
+    "missing_event_ids": 0,
+    "duplicate_game_event_keys": 0,
+    "duplicate_fg_game_event_keys": 0,
+    "missing_fg_team": 0,
+    "event_text_three_mismatch": 0,
+    "event_text_made_mismatch": 0,
+    "event_text_missed_mismatch": 0,
+    "date_min": "2023-11-06",
+    "date_max": "2024-04-08",
+    "columns_read": [
+      "id",
+      "game_id",
+      "team_id",
+      "type_text",
+      "score_value",
+      "scoring_play",
+      "shooting_play",
+      "text",
+      "coordinate_x_raw",
+      "coordinate_y_raw",
+      "game_date",
+      "season_type"
+    ],
+    "note": "Event text checked only for data integrity; outcome-bearing descriptions must not enter model features."
+  }
+}
