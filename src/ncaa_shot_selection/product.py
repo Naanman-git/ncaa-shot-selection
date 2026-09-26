@@ -73,6 +73,11 @@ def run_scenario(df, max_shift=.05, budget=.20, three_cap=.60, risk=1., seed=42,
     gains = 100*samples@(q-current)
     lo, hi = np.quantile(gains,[.025,.975])
     table = pd.DataFrame({"zone": ZONES, "count": counts["count"].to_numpy(),
+        "makes": counts["sum"].to_numpy(),
+        "raw_fg": np.divide(counts["sum"].to_numpy(), counts["count"].to_numpy(),
+                            out=np.zeros(5, dtype=float),
+                            where=counts["count"].to_numpy() > 0),
+        "shrunk_fg": ep/values,
         "current_share": current, "recommended_share": q, "ep": ep,
         "ep_low": np.quantile(samples,.025,axis=0),
         "ep_high": np.quantile(samples,.975,axis=0), "eligible": eligible})

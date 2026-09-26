@@ -8,6 +8,8 @@ The primary source is the SportsDataverse NCAA-native shot release:
 
 The downloaded files are listed with SHA-256 hashes in `../research/source_manifest.json` after the audit step. Do not edit raw files.
 
+`templates/prospective_shots_template.csv` is a separate anonymous collection template for a future post-freeze validation experiment. It must never contain player names, contact information, or consent records. Its fields are defined in `../docs/CODING_GUIDE.md`.
+
 For the dashboard, `processed/shots_scored.parquet` and
 `outputs/final_results.json` are the portable evidence snapshot. They are
 deliberately kept in the repository so a clean Streamlit checkout can open the

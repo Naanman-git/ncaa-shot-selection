@@ -1,0 +1,2 @@
+shot_id,participant_code,session_id,block_id,block_order,strategy,attempt_order,shot_x,shot_y,zone,made,point_value,model_probability,notes
+EXAMPLE-REMOVE,P001,S01,B01,1,current,1,0.0,4.0,rim,1,2,0.6100,Delete this example row before collection

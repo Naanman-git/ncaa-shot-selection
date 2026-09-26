@@ -1,6 +1,6 @@
 {
   "run_id": "ncaa-586d483b1c-374f8136",
-  "generated_utc": "2026-09-21T19:09:46.757144+00:00",
+  "generated_utc": "2026-09-23T18:56:51.776619+00:00",
   "config": {
     "protocol_version": "1.0",
     "training_seasons": [
@@ -432,6 +432,9 @@
       {
         "zone": "rim",
         "count": 450,
+        "makes": 314,
+        "raw_fg": 0.6977777777777778,
+        "shrunk_fg": 0.694172688521172,
         "current_share": 0.2498611882287618,
         "recommended_share": 0.2998611882287618,
         "ep": 1.388345377042344,
@@ -442,6 +445,9 @@
       {
         "zone": "paint",
         "count": 540,
+        "makes": 280,
+        "raw_fg": 0.5185185185185185,
+        "shrunk_fg": 0.5130881566170143,
         "current_share": 0.29983342587451417,
         "recommended_share": 0.2998334258745141,
         "ep": 1.0261763132340287,
@@ -452,6 +458,9 @@
       {
         "zone": "mid",
         "count": 92,
+        "makes": 38,
+        "raw_fg": 0.41304347826086957,
+        "shrunk_fg": 0.4023421562065566,
         "current_share": 0.05108273181565797,
         "recommended_share": 0.0010827318156579682,
         "ep": 0.8046843124131132,
@@ -462,6 +471,9 @@
       {
         "zone": "corner3",
         "count": 121,
+        "makes": 43,
+        "raw_fg": 0.35537190082644626,
+        "shrunk_fg": 0.35617063590399606,
         "current_share": 0.06718489727928928,
         "recommended_share": 0.017184897279289277,
         "ep": 1.0685119077119882,
@@ -472,6 +484,9 @@
       {
         "zone": "abovebreak3",
         "count": 598,
+        "makes": 207,
+        "raw_fg": 0.34615384615384615,
+        "shrunk_fg": 0.34550656544986363,
         "current_share": 0.3320377568017768,
         "recommended_share": 0.38203775680177676,
         "ep": 1.0365196963495908,
@@ -572,6 +587,112 @@
       "gain_low": 3.1297403375826782,
       "gain_high": 6.1217324644782085,
       "feasible": true
+    }
+  ],
+  "hypothesis_results": [
+    {
+      "id": "H1",
+      "hypothesis": "Predicted make probability decreases as distance increases.",
+      "method": "Spearman association across prespecified held-out distance bands.",
+      "result": "Spearman rho = -0.950 across 9 bands.",
+      "status": "supported"
+    },
+    {
+      "id": "H2",
+      "hypothesis": "A lower-probability three-point zone can have higher expected value than a two-point zone.",
+      "method": "Compare held-out corner-three and paint averages from the frozen model.",
+      "result": "Corner three: 36.0% predicted FG and 1.079 EP; paint: 41.9% predicted FG and 0.838 EP.",
+      "status": "supported"
+    },
+    {
+      "id": "H3",
+      "hypothesis": "Raw zone rates move toward pooled estimates after shrinkage.",
+      "method": "Compare raw and 30-attempt-prior rates in the prespecified case study.",
+      "result": "Largest change: mid, 41.3% raw to 40.2% shrunk.",
+      "status": "supported"
+    },
+    {
+      "id": "H4",
+      "hypothesis": "Spatial and prior player history improve held-out probability prediction over a zone baseline.",
+      "method": "Compare final-test Brier score and log loss after model selection was frozen.",
+      "result": "Selected model improved Brier by 0.0019 and log loss by 0.0039.",
+      "status": "supported"
+    }
+  ],
+  "distance_profile": [
+    {
+      "distance_band": "[0, 5)",
+      "attempts": 204425,
+      "observed_fg": 0.6172972972972973,
+      "predicted_fg": 0.6116187220296522
+    },
+    {
+      "distance_band": "[5, 10)",
+      "attempts": 87520,
+      "observed_fg": 0.4130827239488117,
+      "predicted_fg": 0.4222608493193135
+    },
+    {
+      "distance_band": "[10, 15)",
+      "attempts": 47893,
+      "observed_fg": 0.379825861816967,
+      "predicted_fg": 0.3613917256484563
+    },
+    {
+      "distance_band": "[15, 20)",
+      "attempts": 27764,
+      "observed_fg": 0.3745137588243769,
+      "predicted_fg": 0.3668713492022443
+    },
+    {
+      "distance_band": "[20, 23)",
+      "attempts": 26094,
+      "observed_fg": 0.3616923430673718,
+      "predicted_fg": 0.3621746372853147
+    },
+    {
+      "distance_band": "[23, 26)",
+      "attempts": 161041,
+      "observed_fg": 0.3430803335796474,
+      "predicted_fg": 0.3433036320892024
+    },
+    {
+      "distance_band": "[26, 30)",
+      "attempts": 56135,
+      "observed_fg": 0.3231317359935869,
+      "predicted_fg": 0.3269893715456501
+    },
+    {
+      "distance_band": "[30, 40)",
+      "attempts": 3562,
+      "observed_fg": 0.27821448624368333,
+      "predicted_fg": 0.2806631122435628
+    },
+    {
+      "distance_band": "[40, 100)",
+      "attempts": 177,
+      "observed_fg": 0.22033898305084745,
+      "predicted_fg": 0.1987558367816318
+    }
+  ],
+  "model_interpretation": [
+    {
+      "feature": "Shot angle (1 SD)",
+      "coefficient": -0.05396793271449444,
+      "odds_multiplier": 0.9474624885647872,
+      "interpretation": "Association for a one-standard-deviation increase in absolute angle, holding transformed model inputs fixed."
+    },
+    {
+      "feature": "Prior player-zone make tendency (1 SD)",
+      "coefficient": 0.18786440324348302,
+      "odds_multiplier": 1.2066698837334768,
+      "interpretation": "Association for stronger strictly prior-day player-zone history."
+    },
+    {
+      "feature": "Prior player-zone sample size (1 SD)",
+      "coefficient": 0.03962296404205455,
+      "odds_multiplier": 1.0404184250746114,
+      "interpretation": "Association for a larger log prior-attempt count after controlling for the prior make tendency."
     }
   ],
   "limitations": [

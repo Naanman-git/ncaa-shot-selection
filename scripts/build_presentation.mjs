@@ -10,10 +10,13 @@ const { Presentation, PresentationFile } = await import(pathToFileURL(path.join(
 const { resolvePresentationFont, applyPresentationChartFont, finalizePresentation } = await import(pathToFileURL(path.join(SKILL, 'container_tools/artifact_tool_utils.mjs')));
 const TMP = path.join(ROOT, '.artifact-build/presentation');
 const OUTPUT = path.join(ROOT, 'output/presentation/ncaa_shot_selection.pptx');
+const BUILD_ID = Date.now();
+const VALIDATED = path.join(ROOT, '.artifact-build/presentation-output', `validated-${BUILD_ID}.pptx`);
 const C = { navy:'#102A43', teal:'#087F8C', orange:'#D77A38', cream:'#FAF8F2', muted:'#526777', light:'#E6ECEF' };
 const FONT = resolvePresentationFont({ fontFamily:'Arial' });
 const ppt = Presentation.create({slideSize:{width:1280,height:720}});
 const notes = [];
+const rounded = value => Number(Number(value).toFixed(6));
 
 function text(slide, copy, x, y, width, height, size=28, color=C.navy, bold=false) {
   const t=slide.shapes.add({geometry:'textbox',position:{left:x,top:y,width,height},fill:'none',line:{fill:'none',width:0}});
@@ -35,22 +38,24 @@ function slide(title, bodyNotes, dark=false) {
 }
 
 function table(s,headers,rows,opts={}) {
-  const {x=72,y=175,w=1136,h=350,widths}=opts;
+  const {x=72,y=175,w=1136,h=350,widths,fontSize=23}=opts;
   const values=[headers,...rows].map(row=>row.map(String));
   const t=s.tables.add({rows:values.length,columns:headers.length,left:x,top:y,width:w,height:h,
     values,...(widths?{columnWidths:widths}:{})});
   t.styleOptions={headerRow:true,bandedRows:false};
   t.borders.assign({fill:C.light,width:0.5,style:'solid'});
   t.cells.block({row:0,column:0,rowCount:values.length,columnCount:headers.length}).assign({
-    fill:C.cream,textStyle:{typeface:FONT,fontSize:23,color:C.navy},
+    fill:C.cream,textStyle:{typeface:FONT,fontSize,color:C.navy},
     margins:{left:12,right:12,top:10,bottom:10},anchor:'center'});
   t.cells.block({row:0,column:0,rowCount:1,columnCount:headers.length}).assign({
-    fill:C.navy,textStyle:{typeface:FONT,fontSize:23,color:'#FFFFFF',bold:true}});
+    fill:C.navy,textStyle:{typeface:FONT,fontSize,color:'#FFFFFF',bold:true}});
   return t;
 }
 
 function chart(s,type,config) {
-  return null;
+  const c=s.charts.add(type,config);
+  applyPresentationChartFont(c,{fontFamily:FONT});
+  return c;
 }
 
 function image(s,file,x,y,w,h) {
@@ -79,22 +84,27 @@ async function build(m) {
   text(s,m.split_descriptions[2],875,270,325,210,30);
   text(s,m.split_caveat,76,560,1125,72,25,C.muted);
 
-  s=slide('Held-out probability performance',m.notes[3]);
+  s=slide('Prespecified hypotheses',m.notes[3]);
+  table(s,['ID','Hypothesis','Held-out result','Status'],m.hypothesis_rows,
+    {y:165,h:445,widths:[70,410,500,156],fontSize:18});
+  text(s,'The tests use the frozen 2025-26 evaluation and preserve the distinction between prediction and intervention.',76,625,1120,35,20,C.muted);
+
+  s=slide('Held-out probability performance',m.notes[4]);
   table(s,['Model',`Brier score`, 'Log loss'],m.model_rows,
     {y:180,h:300,widths:[676,230,230]});
   text(s,m.model_caption,76,525,1120,92,27,C.muted);
 
-  s=slide('Where shots occur and what they are worth',m.notes[4]);
+  s=slide('Where shots occur and what they are worth',m.notes[5]);
   await image(s,m.maps_figure,62,160,1156,405);
   text(s,m.maps_caption,76,582,1125,65,24,C.muted);
 
-  s=slide('Calibration and uncertainty',m.notes[5]);
+  s=slide('Calibration and uncertainty',m.notes[6]);
   chart(s,'scatter',{
     position:{left:65,top:175,width:690,height:440},
     series:[
-      {name:'Predicted vs observed',xValues:m.calibration.map(x=>x.predicted),values:m.calibration.map(x=>x.observed),
+      {name:'Predicted vs observed',xValues:m.calibration.map(x=>rounded(x.predicted)),values:m.calibration.map(x=>rounded(x.observed)),
         marker:{symbol:'circle',size:9},line:{fill:C.teal,width:2}},
-      {name:'Perfect calibration',xValues:[0,1],values:[0,1],marker:{symbol:'none',size:0},line:{fill:C.muted,width:1.2}}
+      {name:'Perfect calibration',xValues:[0,1],values:[0,1],marker:{symbol:'none',size:2},line:{fill:C.muted,width:1.2}}
     ],scatterOptions:{style:'lineWithMarkers'},hasLegend:false,
     xAxis:{min:0,max:1,majorUnit:0.2,numberFormatCode:'0%',title:'Predicted make probability',textStyle:{fontSize:20,fill:C.muted}},
     yAxis:{min:0,max:1,majorUnit:0.2,numberFormatCode:'0%',title:'Observed make rate',textStyle:{fontSize:20,fill:C.muted},majorGridlines:{fill:C.light,width:1}}
@@ -102,13 +112,13 @@ async function build(m) {
   text(s,m.uncertainty_headline,805,194,394,100,33,C.teal,true);
   text(s,m.uncertainty_body,805,320,390,269,27);
 
-  s=slide(m.scenario_title,m.notes[6]);
+  s=slide(m.scenario_title,m.notes[7]);
   chart(s,'bar',{
     position:{left:65,top:174,width:750,height:415},
     categories:m.zone_mix.map(x=>x.zone),
     series:[
-      {name:'Current mix',values:m.zone_mix.map(x=>x.current),fill:C.navy},
-      {name:'Scenario mix',values:m.zone_mix.map(x=>x.proposed),fill:C.teal}],
+      {name:'Current mix',values:m.zone_mix.map(x=>rounded(x.current)),fill:C.navy},
+      {name:'Scenario mix',values:m.zone_mix.map(x=>rounded(x.proposed)),fill:C.teal}],
     barOptions:{direction:'column',grouping:'clustered',gapWidth:80},hasLegend:true,
     legend:{position:'bottom',textStyle:{fontSize:22,fill:C.navy}},
     xAxis:{textStyle:{fontSize:19,fill:C.muted}},
@@ -120,42 +130,54 @@ async function build(m) {
   text(s,m.scenario_interval,855,426,340,95,24,C.muted);
   text(s,m.scenario_caption,76,594,1125,59,22,C.muted);
 
-  s=slide('Sensitivity to the movement budget',m.notes[7]);
+  s=slide('Sensitivity to the per-zone limit',m.notes[8]);
   chart(s,'bar',{
     position:{left:65,top:178,width:755,height:420},
     categories:m.sensitivity.map(x=>x.label),
-    series:[{name:'Modeled gain',values:m.sensitivity.map(x=>x.gain),fill:C.teal}],
+    series:[{name:'Modeled gain',values:m.sensitivity.map(x=>rounded(x.gain)),fill:C.teal}],
     barOptions:{direction:'column',grouping:'clustered',gapWidth:130},hasLegend:false,
-    xAxis:{title:'Maximum total share reassigned',textStyle:{fontSize:21,fill:C.muted}},
+    xAxis:{title:'Maximum shift per zone',textStyle:{fontSize:21,fill:C.muted}},
     yAxis:{min:0,title:'Modeled points per 100 attempts',textStyle:{fontSize:21,fill:C.muted},majorGridlines:{fill:C.light,width:1}},
-    dataLabels:{showValue:true,position:'outEnd',textStyle:{fontSize:22,fill:C.navy}}
+    dataLabels:{showValue:true,position:'outEnd',numberFormatCode:'0.00',textStyle:{fontSize:22,fill:C.navy}}
   });
   text(s,'The constraints\nshape the answer',866,207,338,105,32,C.teal,true);
   text(s,m.sensitivity_caption,866,349,338,244,27);
 
-  s=slide('What this study supports',m.notes[8],true);
+  s=slide('Prospective validation package',m.notes[9]);
+  text(s,'Frozen before collection',76,185,500,50,34,C.teal,true);
+  text(s,'Model, five zones, strategy shares, metrics and stopping rule',76,252,500,145,27);
+  text(s,'Anonymous collection file',704,185,500,50,34,C.teal,true);
+  text(s,'One row per attempt with participant code, strategy block, location, outcome and pre-shot probability',704,252,500,175,27);
+  text(s,'Analysis after collection',76,455,500,50,34,C.teal,true);
+  text(s,'Brier score, log loss, calibration and achieved zone shares',76,522,500,100,27);
+  text(s,'Strategy comparison',704,455,500,50,34,C.teal,true);
+  text(s,'Observed points per attempt with a session-cluster bootstrap interval',704,522,500,100,27);
+
+  s=slide('What this study supports',m.notes[10],true);
   text(s,m.conclusion,76,193,1125,160,38,'#FFFFFF');
   text(s,m.boundary,76,404,1110,116,29,'#B7CDD5');
   text(s,'Reproducible analysis, interactive explorer, report and editable evidence deck',76,582,1110,56,22,'#B7CDD5');
 }
 
 await fs.mkdir(TMP,{recursive:true});
+await fs.mkdir(path.dirname(VALIDATED),{recursive:true});
 await fs.mkdir(path.dirname(OUTPUT),{recursive:true});
 const manifest=JSON.parse(await fs.readFile(path.join(ROOT,'.artifact-build/report_manifest.json'),'utf8'));
 await build(manifest);
 const candidate=path.join(TMP,'candidate.pptx');
 await (await PresentationFile.exportPptx(ppt)).save(candidate);
 await finalizePresentation({
-  workspaceDir:ROOT,candidatePath:candidate,finalPath:OUTPUT,
+  workspaceDir:ROOT,candidatePath:candidate,finalPath:VALIDATED,
   pythonExecutable:path.join(DEPS,'python/bin/python3'),
   integrityValidatorPath:path.join(SKILL,'container_tools/inspect_presentation_package_integrity.py'),
   layoutValidatorPath:path.join(SKILL,'container_tools/inspect_presentation_layout_geometry.py'),
   layoutArgs:['--expected-slide-size-emu','12192000,6858000','--validate-heading-fit'],
-  explicitTotalSlideCount:9,requiredNativeTableOwnerSlides:[],requiredNativeChartOwnerSlides:[],
+  explicitTotalSlideCount:11,requiredNativeTableOwnerSlides:[],requiredNativeChartOwnerSlides:[],
   materializeLiteralChartWorkbooks:true,
   fontPolicy:{basis:'design',families:[FONT]},verifyArtifactToolImport:true,
-  receiptPath:path.join(TMP,'validation.json'),
+  receiptPath:path.join(TMP,`validation-${BUILD_ID}.json`),
 });
+await fs.copyFile(VALIDATED,OUTPUT);
 await fs.writeFile(path.join(ROOT,'docs/presentation_script.md'),
-  '# Presentation script\n\nNine slides, approximately 6-7 minutes.\n\n'+notes.map(n=>`## ${n.slide}. ${n.title}\n\n${n.notes}\n`).join('\n'));
+  '# Presentation script\n\nEleven slides, approximately 7-8 minutes.\n\n'+notes.map(n=>`## ${n.slide}. ${n.title}\n\n${n.notes}\n`).join('\n'));
 console.log(OUTPUT);

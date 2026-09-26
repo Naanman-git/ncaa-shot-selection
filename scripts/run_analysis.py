@@ -91,6 +91,83 @@ def main():
             result=run_scenario(case,max_shift=shift,risk=risk,prior_rates=zone_prior)
             sensitivity.append({"max_shift":shift,"risk":risk,
                 **{k:result[k] for k in ["gain_per100","gain_low","gain_high","feasible"]}})
+
+    # Prespecified, interpretable checks that correspond to the blueprint's
+    # four substantive hypotheses. These use only the frozen final-test
+    # predictions and the separately defined scenario estimates.
+    test = d.loc[mask].copy()
+    test["predicted_ep"] = test.model_p * test.point_value
+    distance_edges = [0, 5, 10, 15, 20, 23, 26, 30, 40, 100]
+    test["distance_band"] = pd.cut(test.dist_ft, distance_edges, right=False)
+    distance_profile = (test.groupby("distance_band", observed=True)
+        .agg(attempts=("made", "size"), observed_fg=("made", "mean"),
+             predicted_fg=("model_p", "mean"), mean_distance=("dist_ft", "mean"))
+        .reset_index())
+    distance_rho = float(distance_profile.mean_distance.corr(
+        distance_profile.predicted_fg, method="spearman"))
+    distance_rows = [{"distance_band": str(row.distance_band),
+                      "attempts": int(row.attempts),
+                      "observed_fg": float(row.observed_fg),
+                      "predicted_fg": float(row.predicted_fg)}
+                     for row in distance_profile.itertuples()]
+
+    zone_test = (test.groupby("shot_zone", observed=True)
+        .agg(attempts=("made", "size"), observed_fg=("made", "mean"),
+             predicted_fg=("model_p", "mean"), predicted_ep=("predicted_ep", "mean")))
+    corner = zone_test.loc["corner3"]
+    paint = zone_test.loc["paint"]
+    h2_supported = bool(corner.predicted_fg < paint.predicted_fg and
+                        corner.predicted_ep > paint.predicted_ep)
+    max_shrink = max(scenario["table"],
+                     key=lambda row: abs(row["shrunk_fg"] - row["raw_fg"]))
+    selected_test = next(row for row in rows
+                         if row["season"] == config["final_test_season"] and row["model"] == chosen)
+    zone_test_score = next(row for row in rows
+                           if row["season"] == config["final_test_season"] and
+                           row["model"] == "Zone shrinkage")
+    hypothesis_results = [
+        {"id": "H1", "hypothesis": "Predicted make probability decreases as distance increases.",
+         "method": "Spearman association across prespecified held-out distance bands.",
+         "result": f"Spearman rho = {distance_rho:.3f} across {len(distance_rows)} bands.",
+         "status": "supported" if distance_rho < -0.8 else "mixed"},
+        {"id": "H2", "hypothesis": "A lower-probability three-point zone can have higher expected value than a two-point zone.",
+         "method": "Compare held-out corner-three and paint averages from the frozen model.",
+         "result": (f"Corner three: {corner.predicted_fg:.1%} predicted FG and "
+                    f"{corner.predicted_ep:.3f} EP; paint: {paint.predicted_fg:.1%} predicted FG and "
+                    f"{paint.predicted_ep:.3f} EP."),
+         "status": "supported" if h2_supported else "not supported"},
+        {"id": "H3", "hypothesis": "Raw zone rates move toward pooled estimates after shrinkage.",
+         "method": "Compare raw and 30-attempt-prior rates in the prespecified case study.",
+         "result": (f"Largest change: {max_shrink['zone']}, {max_shrink['raw_fg']:.1%} raw to "
+                    f"{max_shrink['shrunk_fg']:.1%} shrunk."),
+         "status": "supported"},
+        {"id": "H4", "hypothesis": "Spatial and prior player history improve held-out probability prediction over a zone baseline.",
+         "method": "Compare final-test Brier score and log loss after model selection was frozen.",
+         "result": (f"Selected model improved Brier by {zone_test_score['brier']-selected_test['brier']:.4f} "
+                    f"and log loss by {zone_test_score['log_loss']-selected_test['log_loss']:.4f}."),
+         "status": "supported" if selected_test["log_loss"] < zone_test_score["log_loss"] else "not supported"},
+    ]
+
+    selected_pipeline = fitted[chosen]
+    feature_names = selected_pipeline.named_steps["features"].get_feature_names_out()
+    coefficients = selected_pipeline.named_steps["model"].coef_[0]
+    interpretable = {
+        name: float(value) for name, value in zip(feature_names, coefficients)
+        if name in {"angle__abs_angle", "history__history_logit", "history__history_size"}
+    }
+    model_interpretation = [
+        {"feature": "Shot angle (1 SD)", "coefficient": interpretable["angle__abs_angle"],
+         "odds_multiplier": float(np.exp(interpretable["angle__abs_angle"])),
+         "interpretation": "Association for a one-standard-deviation increase in absolute angle, holding transformed model inputs fixed."},
+        {"feature": "Prior player-zone make tendency (1 SD)",
+         "coefficient": interpretable["history__history_logit"],
+         "odds_multiplier": float(np.exp(interpretable["history__history_logit"])),
+         "interpretation": "Association for stronger strictly prior-day player-zone history."},
+        {"feature": "Prior player-zone sample size (1 SD)",
+         "coefficient": interpretable["history__history_size"],
+         "odds_multiplier": float(np.exp(interpretable["history__history_size"])),
+         "interpretation": "Association for a larger log prior-attempt count after controlling for the prior make tendency."},
+    ]
     audit_path=ROOT/"research/native_audit_results.json"
     audit=json.loads(audit_path.read_text()) if audit_path.exists() else {}
     season_summary=[]
@@ -117,7 +194,9 @@ def main():
         "data_sha256":digest,"config_sha256":checksum(ROOT/"config/analysis.json"),
         "selected_model":chosen,"model_comparison":rows,"calibration":calibration_rows,
         "test_confidence_intervals":ci,"season_summary":season_summary,"audit":audit,
-        "zone_prior":zone_prior,"scenario":scenario,"sensitivity":sensitivity,"limitations":limitations,
+        "zone_prior":zone_prior,"scenario":scenario,"sensitivity":sensitivity,
+        "hypothesis_results":hypothesis_results,"distance_profile":distance_rows,
+        "model_interpretation":model_interpretation,"limitations":limitations,
         "model_spec":{"training":"2022–23 and 2023–24", "selection":"2024–25", "final_test":"2025–26",
             "features":["five chart zones","cubic distance spline (5 knots)","absolute angle",
                         "prior-day player-zone make rate (30 fixed-prior attempts)","log prior attempts"],

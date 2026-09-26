@@ -17,7 +17,7 @@ This reproducible study evaluates 2,329,277 reconciled shot attempts across four
 
 ### Main findings
 
-The frozen model selected on 2024–25 was **Spatial + player history**; its 2025–26 Brier score and log loss are shown in the held-out table.
+The frozen model selected on 2024-25 was **Spatial + player history**; its 2025-26 Brier score and log loss are shown in the held-out table.
 
 For Ohio State Buckeyes (2026), the constrained descriptive scenario estimates 2.76 points per 100 recorded attempts, with a game-bootstrap range [1.56, 4.06].
 
@@ -88,9 +88,9 @@ The core source does not supply per-shot defender distance, shot-clock time or a
 
 | Role | Seasons | Use |
 | --- | --- | --- |
-| Training | 2022–23, 2023–24 | Fit candidate models and priors |
-| Selection | 2024–25 | Select by log loss; no final-test refit |
-| Final test | 2025–26 | One fixed evaluation after selection |
+| Training | 2022-23, 2023-24 | Fit candidate models and priors |
+| Selection | 2024-25 | Select by log loss; no final-test refit |
+| Final test | 2025-26 | One fixed evaluation after selection |
 
 No final-test outcome was used to choose the model or scenario settings.
 
@@ -104,7 +104,7 @@ The selected history model adds a 30-attempt player-zone prior and log prior att
 
 ### Evaluation
 
-The Brier score is the mean squared difference between predicted make probability and the binary outcome. Log loss penalizes confident errors more strongly. Lower values indicate better predictive performance. Reliability bins compare average prediction with observed make rate. A lower Brier score alone does not prove better calibration [5, 6].
+The Brier score is the mean squared difference between predicted make probability and the binary outcome. Log loss penalizes confident errors more strongly. Lower values indicate better predictive performance. Reliability bins compare average prediction with observed make rate. A lower Brier score alone does not prove better calibration [4].
 
 
 ### Uncertainty
@@ -112,9 +112,19 @@ The Brier score is the mean squared difference between predicted make probabilit
 Metrics use 500 game-cluster bootstrap resamples. Scenario rates use 500 game resamples and 30-attempt shrinkage; intervals are conditional on the fixed selected mix.
 
 
+### Prespecified hypotheses
+
+| ID | Hypothesis | Held-out result | Status |
+| --- | --- | --- | --- |
+| H1 | Predicted make probability decreases as distance increases. | Spearman rho = -0.950 across 9 bands. | Supported |
+| H2 | A lower-probability three-point zone can have higher expected value than a two-point zone. | Corner three: 36.0% predicted FG and 1.079 EP; paint: 41.9% predicted FG and 0.838 EP. | Supported |
+| H3 | Raw zone rates move toward pooled estimates after shrinkage. | Largest change: mid, 41.3% raw to 40.2% shrunk. | Supported |
+| H4 | Spatial and prior player history improve held-out probability prediction over a zone baseline. | Selected model improved Brier by 0.0019 and log loss by 0.0039. | Supported |
+
+
 ## 4. Held-out predictive results
 
-Scores below are computed on the final 2025–26 test season after model selection was frozen.
+Scores below are computed on the final 2025-26 test season after model selection was frozen.
 
 | Model | Brier score | Log loss |
 | --- | --- | --- |
@@ -130,6 +140,17 @@ Reliability bins compare mean predicted make probability with observed make rate
 Calibration is a diagnostic, not a guarantee. The selected probabilities describe recorded field-goal attempts under the available covariates.
 
 
+### Coefficient interpretation
+
+The nonlinear distance spline is interpreted through the held-out distance profile rather than as one linear odds ratio. The standardized terms below show multiplicative changes in odds for one standard deviation, holding the other transformed inputs fixed. They are associations, not causal effects.
+
+**Shot angle (1 SD)**. Beta -0.054; odds multiplier 0.947. Association for a one-standard-deviation increase in absolute angle, holding transformed model inputs fixed.
+
+**Prior player-zone make tendency (1 SD)**. Beta 0.188; odds multiplier 1.207. Association for stronger strictly prior-day player-zone history.
+
+**Prior player-zone sample size (1 SD)**. Beta 0.040; odds multiplier 1.040. Association for a larger log prior-attempt count after controlling for the prior make tendency.
+
+
 ## 5. Frequency, make probability and expected points
 
 For a shot with point value V and make probability p, expected points per attempt equal V multiplied by p. A three-point attempt can therefore have lower make probability and still have higher expected value than a two-point attempt. The comparison requires the same population and a probability estimate appropriate to its context.
@@ -138,15 +159,15 @@ Three-foot chart cells in the final test: observed rate, model probability and r
 
 ![Three-foot chart cells in the final test: observed rate, model probability and recorded point value; sparse cells omitted.](../output/figures/maps.png)
 
-| Zone | Attempts | Observed FG% | Predicted FG% | Predicted EP |
+| Zone | Attempts | Raw FG% | Shrunk FG% | Shrunk EP |
 | --- | --- | --- | --- | --- |
-| rim | 450 | 25.0% | 69.4% | 1.388 |
-| paint | 540 | 30.0% | 51.3% | 1.026 |
-| mid | 92 | 5.1% | 40.2% | 0.805 |
-| corner3 | 121 | 6.7% | 35.6% | 1.069 |
-| abovebreak3 | 598 | 33.2% | 34.6% | 1.037 |
+| rim | 450 | 69.8% | 69.4% | 1.388 |
+| paint | 540 | 51.9% | 51.3% | 1.026 |
+| mid | 92 | 41.3% | 40.2% | 0.805 |
+| corner3 | 121 | 35.5% | 35.6% | 1.069 |
+| abovebreak3 | 598 | 34.6% | 34.6% | 1.037 |
 
-Zone summaries combine frequency with outcome and model values. Point value is geometry-inferred and aggregate-reconciled, not shot-tracking truth.
+The case-study table shows raw and 30-attempt-prior zone rates together. Point value is geometry-inferred and aggregate-reconciled, not shot-tracking truth.
 
 Expected points exclude free throws, offensive rebounds, turnovers before an attempt and the value of passing or driving instead. The maps therefore describe shot outcomes conditional on recorded attempts, not the full value of an offensive possession.
 
@@ -158,11 +179,11 @@ The prespecified Ohio State Buckeyes case study uses 1,801 final-test attempts a
 
 ### Objective and constraints
 
-Let q(z) be the proposed fraction of attempts from zone z, q0(z) the observed fraction and EP(z) its estimated expected points. The linear program maximizes the sum of q(z) multiplied by EP(z), or the corresponding conservative values, subject to the constraints below. SciPy's linear-programming solver evaluates this finite optimization problem [7].
+Let q(z) be the proposed fraction of attempts from zone z, q0(z) the observed fraction and EP(z) its estimated expected points. The linear program maximizes the sum of q(z) multiplied by EP(z), or the corresponding conservative values, subject to the constraints below. SciPy's linear-programming solver evaluates this finite optimization problem [5].
 
 | Constraint | Default setting and interpretation |
 | --- | --- |
-| Per-zone movement | At most ±5 percentage points |
+| Per-zone movement | At most +/-5 percentage points |
 | Total movement | L1 budget 0.20 (10 points can move) |
 | Three-point share | At most 60% |
 | Sparse support | Zones below 30 attempts or five games stay fixed |
@@ -186,9 +207,9 @@ The movement cap and risk penalty are varied while keeping the case study, prior
 
 | Scenario setting | Modeled gain / 100 attempts | Reassigned share |
 | --- | --- | --- |
-| 2.5% | 1.38 [0.78, 2.03] | — |
-| 5.0% | 2.76 [1.56, 4.06] | — |
-| 10.0% | 4.55 [3.13, 6.12] | — |
+| 2.5% | 1.38 [0.78, 2.03] | Fixed risk = 1 |
+| 5.0% | 2.76 [1.56, 4.06] | Fixed risk = 1 |
+| 10.0% | 4.55 [3.13, 6.12] | Fixed risk = 1 |
 
 The gain is sensitive to the amount of reassignment allowed and to the risk penalty; it should be treated as a planning diagnostic, not an intervention estimate.
 
@@ -203,9 +224,23 @@ The displayed range resamples games and accounts for zone-rate sampling variatio
 Resampling observed games does not reveal unobserved shot opportunities or opponents' strategic response. A narrow interval around a conditional scenario should not be interpreted as a narrow interval for an intervention's real-world effect. The fixed model and study design introduce additional uncertainty beyond the displayed resampling intervals.
 
 
-## 8. Conclusions, limitations and reproducibility
+## 8. Prospective validation readiness
 
-The finished product provides a reproducible NCAA Division I shot-selection workflow: reconciled cohort, chronological probability evaluation, conditional mix scenarios and an interactive explorer.
+The repository includes a frozen collection protocol, anonymous shot template and validation analyzer. A real strategy-effect result still requires new attempts collected after the model, zone definitions, shot distributions and metrics are frozen.
+
+| Component | Prepared artifact |
+| --- | --- |
+| Coding rules | docs/CODING_GUIDE.md |
+| Collection and analysis protocol | docs/PROSPECTIVE_VALIDATION_PROTOCOL.md |
+| Anonymous data template | data/templates/prospective_shots_template.csv |
+| Validation analyzer | scripts/analyze_prospective_validation.py |
+
+The analyzer computes new-shot Brier score, log loss, calibration bins, observed points per attempt for each strategy, a session-cluster bootstrap interval and achieved zone shares. It refuses incomplete or invalid input rather than creating a result from missing evidence.
+
+
+## 9. Conclusions, limitations and reproducibility
+
+The finished product provides a reproducible NCAA Division I shot-selection workflow: reconciled cohort, chronological probability evaluation, conditional mix scenarios, a prospective validation package and an interactive explorer.
 
 
 ### Limits of the evidence
@@ -235,7 +270,7 @@ Public access and code licensing do not establish permission to redistribute the
 
 The repository contains the data audit, analysis code, saved model, final result JSON, static evidence figures and an interactive explorer. The report and slide deck read the frozen analysis output rather than introducing separately entered results. See the repository README for environment setup and the documented rebuild command.
 
-The explorer supports comparing recorded shot distributions and conditional scenarios. Any prospective strategy evaluation would require a separate protocol, an opportunity-aware design and new observations collected after freezing the intervention. That experiment falls outside the historical analysis reported here.
+The explorer supports comparing recorded shot distributions and conditional scenarios. The prospective package makes the next experiment reproducible, but no strategy-effect claim exists until valid post-freeze observations are collected and analyzed.
 
 
 ## References and source ledger
@@ -253,7 +288,7 @@ The explorer supports comparing recorded shot distributions and conditional scen
 
 ### Data and software traceability
 
-Run ncaa-586d483b1c-374f8136; data SHA-256 586d483b1c94707dd94d813f7167b9570efdd69894545f5af99671fc523f2d45; configuration SHA-256 374f8136f61a8eb8a606be96ed2a3b058096978b7aecaff810b61c60cb98d622. Rebuild with scripts/build_clean_table.py, scripts/run_analysis.py, scripts/build_report.py and scripts/build_presentation.mjs.
+Run ncaa-586d483b1c-374f8136; data SHA-256 586d483b1c94707dd94d813f7167b9570efdd69894545f5af99671fc523f2d45; configuration SHA-256 374f8136f61a8eb8a606be96ed2a3b058096978b7aecaff810b61c60cb98d622. Rebuild with scripts/build_clean_table.py, scripts/run_analysis.py, scripts/build_report.py and scripts/build_presentation.mjs. Analyze new attempts with scripts/analyze_prospective_validation.py.
 
 Access date for online references: 21 September 2026. This independent project uses public basketball data and makes no claim of university, NCAA or team affiliation. The supplied blueprint's institutional wording does not establish an affiliation for this analysis.
 

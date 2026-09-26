@@ -139,6 +139,17 @@ def render_validation(results: dict):
         st.caption("2022–23 and 2023–24 provide training data; 2024–25 selects the model; 2025–26 is the fixed final evaluation. The saved report documents the freeze and evaluation policy.")
     table = evaluation.rename(columns={"model": "Model", "n": "Attempts", "brier": "Brier score", "log_loss": "Log loss"})
     dataframe(table[["Model", "Attempts", "Brier score", "Log loss"]], column_config={"Brier score": st.column_config.NumberColumn(format="%.4f"), "Log loss": st.column_config.NumberColumn(format="%.4f")})
+    hypotheses = pd.DataFrame(results.get("hypothesis_results", []))
+    if not hypotheses.empty:
+        st.markdown("### Prespecified hypotheses")
+        view = hypotheses.rename(columns={"id": "ID", "hypothesis": "Hypothesis", "result": "Held-out result", "status": "Status"})
+        dataframe(view[["ID", "Hypothesis", "Held-out result", "Status"]])
+    interpretation = pd.DataFrame(results.get("model_interpretation", []))
+    if not interpretation.empty:
+        with st.expander("Model coefficient interpretation"):
+            st.write("The distance effect uses a nonlinear spline, so the report interprets it through held-out distance bands. These standardized terms are associations with prediction odds, holding the other transformed inputs fixed.")
+            view = interpretation.rename(columns={"feature": "Feature", "coefficient": "Coefficient", "odds_multiplier": "Odds multiplier", "interpretation": "Interpretation"})
+            dataframe(view[["Feature", "Coefficient", "Odds multiplier", "Interpretation"]], column_config={"Coefficient": st.column_config.NumberColumn(format="%.3f"), "Odds multiplier": st.column_config.NumberColumn(format="%.3f")})
 
 
 def render_methods(results: dict):
@@ -151,11 +162,16 @@ def render_methods(results: dict):
         st.markdown("### Data and reproducibility")
         st.write("The NCAA-native shot files are distributed by SportsDataverse. The build preserves raw files, checks duplicates and coordinates, validates Division I membership, and records exclusions. Coverage is conditional on the publisher's available games.")
         st.markdown("[NCAA shot data](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/ncaa_mbb_shots) · [NCAA rules and court resources](https://www.ncaa.org/sports/2013/12/2/men-s-basketball-rules-of-the-game.aspx)")
+        st.markdown("### Coding guide")
+        st.write("A project coding guide defines the historical fields, five source zones, inclusion rules, anonymous prospective fields, quality checks, and missing-data policy.")
     with b:
         st.markdown("### Interpreting a scenario")
         st.write("The scenario redistributes a small share of recorded attempts between five source-defined zones. Zone estimates use the selected sample with a pooled prior; the frozen predictive model and the retrospective scenario answer different questions.")
         st.write("An estimated gain assumes shooting efficiency stays similar after the mix changes. Defenders, fatigue, play calls, shot availability, and roster changes can all break that assumption. Uncertainty describes the estimate under the model assumptions, not every source of real-world uncertainty.")
         st.write("The court shows approximately three-foot cells. Prediction maps average frozen model estimates only at observed locations. Low-count cells are blank. The source zones are not inferred from the displayed court lines.")
+        st.markdown("### Prospective validation")
+        st.write("The project includes a post-freeze protocol, anonymous shot template, and analyzer for new attempts. The analyzer will report Brier score, log loss, calibration, strategy points per attempt, and a session-cluster interval after real observations are collected.")
+        st.caption("No prospective outcome is reported yet. The historical scenario remains a conditional estimate rather than an intervention result.")
     limitations = results.get("limitations", [])
     if limitations:
         with st.expander("Study limitations", expanded=True):
@@ -167,16 +183,26 @@ def render_methods(results: dict):
     with st.expander("Audit and run details"):
         st.json({"run_id": results.get("run_id", "unavailable"), "audit": results.get("audit", {})}, expanded=False)
     st.markdown("### Take the research with you")
-    downloads = st.columns(3)
-    download_button("Download analysis results", json.dumps(results, indent=2, default=str), file_name="ncaa_analysis_results.json", mime="application/json")
+    downloads = st.columns(5)
+    with downloads[0]:
+        download_button("Download analysis results", json.dumps(results, indent=2, default=str), file_name="ncaa_analysis_results.json", mime="application/json")
     candidates = [(ROOT / "output/pdf", ".pdf", "application/pdf"), (ROOT / "output/presentation", ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation")]
-    for col, (directory, suffix, mime) in zip(downloads[1:], candidates):
+    for col, (directory, suffix, mime) in zip(downloads[1:3], candidates):
         files = sorted(directory.glob(f"*{suffix}")) if directory.exists() else []
         if files:
-            artifact = files[0]
-            download_button("Download research report" if suffix == ".pdf" else "Download presentation", artifact.read_bytes(), file_name=artifact.name, mime=mime)
+            artifact = files[-1]
+            with col:
+                download_button("Download research report" if suffix == ".pdf" else "Download presentation", artifact.read_bytes(), file_name=artifact.name, mime=mime)
         else:
             col.caption("Research report pending" if suffix == ".pdf" else "Presentation pending")
+    protocol = ROOT / "docs/PROSPECTIVE_VALIDATION_PROTOCOL.md"
+    template = ROOT / "data/templates/prospective_shots_template.csv"
+    if protocol.exists():
+        with downloads[3]:
+            download_button("Download validation protocol", protocol.read_text(), file_name=protocol.name, mime="text/markdown")
+    if template.exists():
+        with downloads[4]:
+            download_button("Download shot template", template.read_bytes(), file_name=template.name, mime="text/csv")
 
 
 def main():

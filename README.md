@@ -2,6 +2,8 @@
 
 This finished project studies recorded NCAA Division I men’s field-goal attempts. It produces a reproducible probability model, a transparent constrained shot-mix scenario, an interactive Streamlit explorer, an academic PDF and an editable presentation.
 
+The repository also includes the blueprint-completion package: a formal coding guide, four prespecified hypotheses with saved held-out results, interpretable standardized model terms, and a prospective validation protocol with an anonymous data template and analysis script. A prospective strategy result is intentionally absent until valid post-freeze observations are collected.
+
 The frozen protocol uses native SportsDataverse NCAA shot releases for 2023–2026. A game enters the analysis only when both teams are present and native field-goal and three-point counts reconcile to the matching ESPN team box score. Exact duplicate rows are retained because the native source has no event identifier. The native zone and 2/3-point value are geometry-inferred by the upstream adapter, so the report describes them as recorded, inferred fields rather than tracking truth.
 
 The model trains on 2022–23 and 2023–24, selects on 2024–25 by log loss, and evaluates once on 2025–26. The selected model is spatial L2 logistic regression with distance splines, angle, zone and strictly prior-day player-zone history. The scenario engine is separate: zone rates shrink toward training priors, movement is limited to ±5 percentage points per zone and an L1 budget of 0.20, and uncertainty is estimated with game resampling. It is not a causal intervention estimate.
@@ -30,5 +32,7 @@ The error in the screenshot is a repository connection message, not an applicati
 Do not upload `data/raw/`, `.research-deps/`, or the large local build artifacts under `data/processed/` and `data/outputs/`; they are excluded from the deployment package. If you regenerate the analysis, run `PYTHONPATH=src .venv/bin/python scripts/prepare_deployment.py` and commit the updated `data/app/` snapshot. Streamlit’s deployment environment reads dependencies from the root `requirements.txt` and copies files that are present in the repository.
 
 Primary evidence is in `data/outputs/final_results.json` and `data/processed/shots_scored.parquet`. Finished artifacts are [the academic report](output/pdf/ncaa_shot_selection_report.pdf) and [the editable presentation](output/presentation/ncaa_shot_selection.pptx). Raw files and source hashes are under `data/raw/` and `research/`.
+
+For a new-shot experiment, follow [the prospective validation protocol](docs/PROSPECTIVE_VALIDATION_PROTOCOL.md), use [the coding guide](docs/CODING_GUIDE.md), copy `data/templates/prospective_shots_template.csv`, and analyze the completed file with `scripts/analyze_prospective_validation.py`. The analyzer validates the schema before reporting probability performance and the strategy comparison.
 
 The analysis predicts makes for recorded attempts and estimates conditional points per recorded attempt; it does not model all possessions, free throws, defensive response, shot availability or the causal effect of changing strategy. Public access and code do not grant permission to redistribute upstream data.
