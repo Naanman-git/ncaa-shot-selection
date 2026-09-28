@@ -19,6 +19,7 @@ from ncaa_shot_selection.product import (
     load_analysis, load_scored_data, run_scenario, scope_summary,
 )
 from ncaa_shot_selection.streamlit_compat import full_width_kwargs
+from ncaa_shot_selection.guide import render_beginner_guide
 
 st.set_page_config(page_title="CourtSense · NCAA shot selection", page_icon="🏀", layout="wide", initial_sidebar_state="expanded")
 
@@ -259,23 +260,28 @@ def main():
         st.stop()
     with st.sidebar:
         st.markdown('<p class="eyebrow">Explore the evidence</p>', unsafe_allow_html=True)
-        st.header("Choose your view")
-        seasons = sorted(shots["season"].unique().tolist(), reverse=True)
-        season = st.selectbox("Season", seasons, format_func=season_label, key="season")
-        season_shots = shots.loc[shots["season"] == season]
-        teams = sorted(season_shots["team_name"].dropna().unique().tolist())
-        default_team = next((name for name in teams if "Ohio State" in name), None)
-        team_options = ["All Division I teams", *teams]
-        team = st.selectbox("Team", team_options, index=team_options.index(default_team) if default_team else 0, key="team")
-        team_shots = season_shots if team == team_options[0] else season_shots.loc[season_shots["team_name"] == team]
-        player_table = team_shots[["player_key", "player_name"]].drop_duplicates("player_key").sort_values("player_name")
-        player_names = dict(zip(player_table["player_key"], player_table["player_name"]))
-        player = st.selectbox("Player", ["all", *player_table["player_key"].tolist()], format_func=lambda key: "All players" if key == "all" else str(player_names.get(key, key)), key="player")
-        scope = team_shots if player == "all" else team_shots.loc[team_shots["player_key"] == player]
-        st.divider()
-        cell_minimum = st.slider("Minimum attempts per model-map cell", 1, 30, 5, help="Only the probability and expected-points maps hide cells below this threshold. The frequency map retains all visible attempts.")
-        st.caption("Source seasons use the ending year. This explorer covers men's Division I basketball only.")
-        st.markdown('<div class="note">A shot-quality estimate is evidence for a question, not a guarantee of a better play.</div>', unsafe_allow_html=True)
+        st.header("Explore & learn")
+        st.caption("Use the arrow above to close this sidebar; the top-left arrow opens it again.")
+        filters_tab, guide_tab = st.tabs(["Choose your view", "Beginner’s guide"])
+        with filters_tab:
+            seasons = sorted(shots["season"].unique().tolist(), reverse=True)
+            season = st.selectbox("Season", seasons, format_func=season_label, key="season")
+            season_shots = shots.loc[shots["season"] == season]
+            teams = sorted(season_shots["team_name"].dropna().unique().tolist())
+            default_team = next((name for name in teams if "Ohio State" in name), None)
+            team_options = ["All Division I teams", *teams]
+            team = st.selectbox("Team", team_options, index=team_options.index(default_team) if default_team else 0, key="team")
+            team_shots = season_shots if team == team_options[0] else season_shots.loc[season_shots["team_name"] == team]
+            player_table = team_shots[["player_key", "player_name"]].drop_duplicates("player_key").sort_values("player_name")
+            player_names = dict(zip(player_table["player_key"], player_table["player_name"]))
+            player = st.selectbox("Player", ["all", *player_table["player_key"].tolist()], format_func=lambda key: "All players" if key == "all" else str(player_names.get(key, key)), key="player")
+            scope = team_shots if player == "all" else team_shots.loc[team_shots["player_key"] == player]
+            st.divider()
+            cell_minimum = st.slider("Minimum attempts per model-map cell", 1, 30, 5, help="Only the probability and expected-points maps hide cells below this threshold. The frequency map retains all visible attempts.")
+            st.caption("Source seasons use the ending year. This explorer covers men's Division I basketball only.")
+            st.markdown('<div class="note">A shot-quality estimate is evidence for a question, not a guarantee of a better play.</div>', unsafe_allow_html=True)
+        with guide_tab:
+            render_beginner_guide(st)
     st.markdown('<p class="eyebrow">NCAA DIVISION I · MEN’S BASKETBALL</p>', unsafe_allow_html=True)
     st.title("Find the value in every zone.")
     st.markdown('<p class="lead">Explore where teams shoot, how likely those attempts are to fall, and what a carefully constrained change in shot mix could mean.</p>', unsafe_allow_html=True)
@@ -288,9 +294,10 @@ def main():
     cards = st.columns(5)
     cards[0].metric("Recorded attempts", f"{summary['count']:,}", help=f"Across {summary['games']:,} distinct games in the available source.")
     cards[1].metric("Games represented", f"{summary['games']:,}")
-    cards[2].metric("Observed field-goal %", f"{summary['fg_pct']:.1%}")
-    cards[3].metric("Observed points / attempt", f"{summary['observed_pps']:.3f}")
-    cards[4].metric("Predicted points / attempt", f"{summary['expected_pps']:.3f}")
+    cards[2].metric("Observed field-goal %", f"{summary['fg_pct']:.1%}", help="Shots made divided by shots attempted. Making 45 of 100 shots gives 45%. Free throws are excluded.")
+    cards[3].metric("Observed points / attempt", f"{summary['observed_pps']:.3f}", help="Actual field-goal points divided by attempts. 110 points from 100 attempts equals 1.10 points per attempt.")
+    cards[4].metric("Predicted points / attempt", f"{summary['expected_pps']:.3f}", help="Average predicted make probability multiplied by each shot's point value. A 40% chance on a three-pointer gives 1.20 expected points.")
+    st.caption("First visit? Open the sidebar using the top-left arrow and select Beginner’s guide for a tour or a term lookup.")
     if summary["count"] < 100:
         st.warning("Small sample: fewer than 100 recorded attempts. Treat maps and zone estimates as exploratory; a few shots can change them substantially.")
     court_tab, scenario_tab, validation_tab, methods_tab = st.tabs(["Court explorer", "Shot-mix scenarios", "Model validation", "Methods & downloads"])
@@ -311,7 +318,15 @@ def main():
             zone_table["zone"] = zone_table["zone"].map(ZONE_NAMES).fillna(zone_table["zone"])
         elif "shot_zone" in zone_table:
             zone_table["shot_zone"] = zone_table["shot_zone"].map(ZONE_NAMES).fillna(zone_table["shot_zone"])
-        dataframe(zone_table)
+        dataframe(zone_table, column_config={
+            "shot_zone": "Court zone", "zone": "Court zone",
+            "count": st.column_config.NumberColumn("Attempts", format="%,d"),
+            "makes": st.column_config.NumberColumn("Shots made", format="%,d"),
+            "fg_pct": st.column_config.NumberColumn("Field-goal %", format="percent", help="Makes divided by attempts; free throws excluded."),
+            "observed_pps": st.column_config.NumberColumn("Observed points / attempt", format="%.3f"),
+            "expected_pps": st.column_config.NumberColumn("Predicted points / attempt", format="%.3f"),
+            "share": st.column_config.NumberColumn("Share of attempts", format="percent"),
+        })
         download_button("Download selected zone summary", csv_bytes(zone_table), file_name=f"ncaa_{season}_zone_summary.csv", mime="text/csv")
     with scenario_tab:
         st.subheader("Change the mix. Keep the assumptions visible.")
@@ -350,7 +365,21 @@ def main():
                     if scenario.get("message"):
                         st.caption(scenario["message"])
                 with st.expander("Zone estimates and scenario table"):
-                    dataframe(scenario["table"])
+                    scenario_view = scenario["table"].copy()
+                    scenario_view["zone"] = scenario_view["zone"].map(ZONE_NAMES).fillna(scenario_view["zone"])
+                    dataframe(scenario_view, column_config={
+                        "zone": "Court zone",
+                        "count": st.column_config.NumberColumn("Attempts", format="%,d"),
+                        "makes": st.column_config.NumberColumn("Shots made", format="%,d"),
+                        "raw_fg": st.column_config.NumberColumn("Recorded make rate", format="percent"),
+                        "shrunk_fg": st.column_config.NumberColumn("Adjusted make rate", format="percent", help="Recorded rate blended with an earlier pooled rate to stabilize small samples."),
+                        "current_share": st.column_config.NumberColumn("Recorded shot share", format="percent"),
+                        "recommended_share": st.column_config.NumberColumn("Scenario shot share", format="percent"),
+                        "ep": st.column_config.NumberColumn("Estimated points / attempt", format="%.3f"),
+                        "ep_low": st.column_config.NumberColumn("Lower 95% bound", format="%.3f", help="Lower game-resampling bound for estimated points per attempt."),
+                        "ep_high": st.column_config.NumberColumn("Upper 95% bound", format="%.3f", help="Upper game-resampling bound for estimated points per attempt."),
+                        "eligible": st.column_config.CheckboxColumn("Enough evidence to change mix"),
+                    })
                 download_button("Download scenario table", csv_bytes(scenario["table"]), file_name=f"ncaa_{season}_scenario.csv", mime="text/csv")
     with validation_tab:
         render_validation(results)

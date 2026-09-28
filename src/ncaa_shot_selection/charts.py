@@ -66,7 +66,12 @@ def court_heatmap(bins: dict, kind: str, minimum: int = 5) -> go.Figure:
         raise ValueError("Unknown court-map quantity")
     z = np.array(bins[kind], copy=True, dtype=float)
     z[bins["count"] < (1 if kind == "count" else minimum)] = np.nan
-    colorbar = {"orientation": "h", "x": .5, "xanchor": "center", "y": -.04, "len": .82, "thickness": 10, "outlinewidth": 0}
+    # Anchor the top of the complete legend below the plot. The default middle
+    # anchor lets a horizontal colorbar overlap the baseline as the chart resizes.
+    colorbar = {"orientation": "h", "x": .5, "xanchor": "center",
+                "y": -.08, "yanchor": "top", "len": .86, "thickness": 12,
+                "outlinewidth": 0, "xpad": 0, "ypad": 0,
+                "tickfont": {"size": 11}, "nticks": 4}
     spec = {"count": ("Attempts", None, None, ".0f"), "probability": ("Make probability", 0, 1, ".0%"), "points": ("Points / attempt", 0, 2, ".2f")}[kind]
     colorbar["title"] = {"text": spec[0], "font": {"size": 11}, "side": "bottom"}
     colorbar["tickformat"] = spec[3]
@@ -75,10 +80,11 @@ def court_heatmap(bins: dict, kind: str, minimum: int = 5) -> go.Figure:
         colorbar=colorbar, hoverongaps=False,
         hovertemplate=f"{spec[0]}: %{{z:{spec[3]}}}<br>Attempts in cell: %{{customdata:.0f}}<extra></extra>"))
     _add_court(fig)
-    style_figure(fig, 370)
-    fig.update_layout(margin={"l": 3, "r": 3, "t": 8, "b": 65})
-    fig.update_xaxes(range=[-26, 26], visible=False, fixedrange=True)
-    fig.update_yaxes(range=[-6.25, 42.75], visible=False, fixedrange=True, scaleanchor="x", scaleratio=1)
+    style_figure(fig, 410)
+    fig.update_layout(margin={"l": 16, "r": 16, "t": 8, "b": 100})
+    fig.update_xaxes(range=[-26, 26], visible=False, fixedrange=True, constrain="domain")
+    fig.update_yaxes(range=[-6.25, 42.75], visible=False, fixedrange=True,
+                     scaleanchor="x", scaleratio=1, constrain="domain")
     return fig
 
 
