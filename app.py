@@ -120,9 +120,48 @@ def render_validation(results: dict):
     selected = evaluation.loc[evaluation["model"] == selected_name]
     chosen = selected.iloc[0] if len(selected) else evaluation.iloc[0]
     a, b, c = st.columns(3)
-    a.metric("Brier score · lower is better", f"{chosen['brier']:.4f}")
-    b.metric("Log loss · lower is better", f"{chosen['log_loss']:.4f}")
+    a.metric(
+        "Mean Brier score · lower is better",
+        f"{chosen['brier']:.4f}",
+        help="The average squared gap between each predicted make probability and the actual made-or-missed result.",
+    )
+    b.metric(
+        "Mean log loss · lower is better",
+        f"{chosen['log_loss']:.4f}",
+        help="The average probability penalty for the actual result. Confident wrong predictions receive a larger penalty.",
+    )
     c.metric("Evaluated attempts", f"{int(chosen['n']):,}")
+    baseline = evaluation.loc[evaluation["model"] == "Global rate"]
+    baseline_row = baseline.iloc[0] if len(baseline) else None
+    brier_detail, log_loss_detail = st.columns(2, gap="large")
+    with brier_detail:
+        st.markdown("#### What the Brier score means")
+        st.write(
+            f"**{chosen['brier']:.4f}** is the mean squared difference between the model's "
+            "predicted make probability and the actual result for every evaluated shot. "
+            "A perfect score is 0; smaller values mean the probabilities were closer to what happened."
+        )
+        if baseline_row is not None:
+            st.caption(
+                f"The selected model is {baseline_row['brier'] - chosen['brier']:.4f} lower than "
+                "the global-rate baseline on this evaluation season."
+            )
+    with log_loss_detail:
+        st.markdown("#### What the log loss means")
+        st.write(
+            f"**{chosen['log_loss']:.4f}** is the mean penalty assigned to the probability given to "
+            "the result that actually occurred. A perfect score is 0; smaller values are better, and "
+            "confident wrong predictions are penalized much more heavily."
+        )
+        if baseline_row is not None:
+            st.caption(
+                f"The selected model is {baseline_row['log_loss'] - chosen['log_loss']:.4f} lower than "
+                "the global-rate baseline on this evaluation season."
+            )
+    st.caption(
+        "Both values are averages across the evaluated attempts. They are model-error scores, not shooting percentages, "
+        "and should be compared using the same shots and season."
+    )
     chart, explanation = st.columns([1.15, 1], gap="large")
     with chart:
         st.markdown("### Probability calibration")
@@ -135,7 +174,7 @@ def render_validation(results: dict):
         st.markdown("### How to read this")
         st.write("A point close to the diagonal means predicted and observed make rates agree. A point below the line means the model was too optimistic in that probability range.")
         st.write(f"**Selected model:** {nice_model(str(selected_name))}.")
-        st.write("Brier score measures squared probability error. Log loss penalizes confident mistakes more heavily. The simple baselines are the standard the selected model must earn its place against.")
+        st.write("The simple baselines are the standard the selected model must earn its place against. The separate score explanations above describe what each average measures.")
         st.caption("2022–23 and 2023–24 provide training data; 2024–25 selects the model; 2025–26 is the fixed final evaluation. The saved report documents the freeze and evaluation policy.")
     table = evaluation.rename(columns={"model": "Model", "n": "Attempts", "brier": "Brier score", "log_loss": "Log loss"})
     dataframe(table[["Model", "Attempts", "Brier score", "Log loss"]], column_config={"Brier score": st.column_config.NumberColumn(format="%.4f"), "Log loss": st.column_config.NumberColumn(format="%.4f")})
