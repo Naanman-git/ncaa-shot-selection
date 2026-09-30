@@ -1,0 +1,31 @@
+{
+  "built_utc": "2026-09-30T04:48:57.049832+00:00",
+  "candidate_team_games": 40196,
+  "matched_boxes": 40196,
+  "reconciled_team_games": 40194,
+  "excluded_team_games": 2,
+  "aggregate_rows": 2884,
+  "formula": "FGA - offensive rebounds + total turnovers + 0.475 * FTA; average both teams per game",
+  "sources": [
+    {
+      "file": "team_box_2023.parquet",
+      "sha256": "2dc03013ed57653e7063134bfc6af0cd96866cb25c11268288828ff42757a84c"
+    },
+    {
+      "file": "team_box_2024.parquet",
+      "sha256": "b9137f1cb2b8bc94836c63842de8c587df197bf7bd7746727593e1301a819b2d"
+    },
+    {
+      "file": "team_box_2025.parquet",
+      "sha256": "571f7ab5c4dd5c4332544f27a0e9d32d131f6f20c4527884a7e180084ae887c9"
+    },
+    {
+      "file": "team_box_2026.parquet",
+      "sha256": "db58650c1a9b2a1b6c8735507b8e922580ea514bb9f2ccbc1d91ae6588a27f42"
+    }
+  ],
+  "attribution": "SportsDataverse / hoopR.mbb authors; ESPN-origin team box scores; transformed and aggregated by CourtSense",
+  "license_url": "https://github.com/sportsdataverse/hoopR-mbb-data/blob/main/LICENSE.md",
+  "method_url": "https://kenpom.com/blog/ratings-glossary/",
+  "limits": "Estimated possessions, no possession sequence reconstruction; unadjusted for schedule. Home/away designations may include neutral-site games."
+}

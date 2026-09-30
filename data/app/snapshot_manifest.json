@@ -1,0 +1,10 @@
+{
+  "run_id": "ncaa-586d483b1c-374f8136",
+  "rows": 2329277,
+  "files": {
+    "shots_scored.parquet": "265c37e853479e81cc809b5691ef42f6b570b259178dcc519ea7ca73b633d11d",
+    "final_results.json": "76e22d897dedabd5fe40cf59478fd40e713e3d65f811e4219d7b016964fcea2d",
+    "team_context.parquet": "0acb592ac87272ccb39e5cf25b53d824cabb2d728455230d82c7da0710ba256a",
+    "context_manifest.json": "a0a7b75e1b0afc1d42be7b69db8dabb9342d221d13112cadcbd48b01c6b501b5"
+  }
+}

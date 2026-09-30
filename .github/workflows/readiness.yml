@@ -1,0 +1,19 @@
+name: Hosted app readiness
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [CourtSense quality checks]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  readiness:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: python3 scripts/check_deployment.py

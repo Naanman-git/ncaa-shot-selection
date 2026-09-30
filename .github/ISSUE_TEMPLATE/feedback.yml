@@ -1,0 +1,16 @@
+name: CourtSense feedback
+description: Report a problem or suggest a basketball analysis feature.
+body:
+  - type: textarea
+    id: selection
+    attributes:
+      label: Page and selection
+      description: Include the season, team and player, if relevant. Do not include private personal information.
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true

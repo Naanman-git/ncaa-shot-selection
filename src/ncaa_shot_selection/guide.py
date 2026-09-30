@@ -7,9 +7,12 @@ shots are to go in, and what a small change in shot selection could mean.
 
 1. In **Choose your view**, pick a season, team and optionally a player.
 2. Open **Court explorer** to see where shots happen and what they are worth.
-3. Try **Shot-mix scenarios** to explore modest changes in shot selection.
-4. Open **Model validation** to check prediction quality on later games.
-5. Visit **Methods & downloads** for the research report and presentation.
+3. Try **Compare teams** and download a printable team report card.
+4. Open **Player development** for a player's game-by-game trends.
+5. Explore **Shot-mix scenarios** and their uncertainty, or **Team context** for whole-offense estimates.
+6. Open **Model validation** to check prediction quality on later games.
+7. Use **Story mode** for a six-chapter walkthrough with the selected team or player.
+8. Visit **Methods & downloads** for reports, version details and a feedback note.
 
 Use the arrow at the top of this sidebar to collapse it. Reopen it with the
 arrow in the top-left corner. Each topic below can also be opened or closed.
@@ -117,6 +120,23 @@ A **baseline** is a simple reference model. The global-rate baseline assigns the
 same training-data make rate to every shot. Compare scores on the same evaluation
 shots. A **hypothesis** is a research claim tested against the data;
 a **coefficient** describes a model association, not proof of cause and effect.
+"""),
+    ("Possessions, team context and player trends", """
+**Points per estimated possession** includes the team's total score, including free
+throws. Estimated possessions account for shots, offensive rebounds, turnovers
+and free-throw attempts. They are approximations from box scores, not counted play sequences.
+The **Team context** page explains the formula and shows home/away designations.
+Neutral-site games can still carry a home/away designation in the source.
+
+**Player development** shows one player's selected season. The recent five-game
+average divides all points by all attempts in that window, so small games do not
+receive equal weight to large ones. Practice prompts suggest video-review questions;
+they are not validated training advice. Source player IDs usually change between
+seasons, so cross-season identities are not automatically merged.
+
+**Sample support** labels summarize observations: usable = at least 30 attempts in
+5 games; broader = at least 100 attempts in 10 games. They do not measure the
+probability that a recommendation will succeed.
 """),
     ("What to trust · methods and downloads", """
 The project trains on 2022–23 and 2023–24, selects its model on 2024–25,
