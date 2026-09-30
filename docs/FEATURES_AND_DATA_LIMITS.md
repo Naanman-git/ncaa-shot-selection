@@ -6,7 +6,6 @@
 - Download a self-contained HTML team report card; browser printing supports a compact A4 handout or Save as PDF.
 - Inspect per-zone sample support, fixed-mix game-bootstrap intervals, stricter scenario limits and separate historical season scenarios. Support labels are descriptive thresholds, not statistical confidence levels.
 - Inspect a player's game-by-game season, weighted recent-five-game trend, shot map and video-review prompts. No causal training benefit is claimed.
-- Follow six interactive story chapters using the selected team/player and download speaking notes.
 - Explore home/away source designations and points per estimated possession from reconciled team box scores.
 - See application, protocol and analysis dates; draft and download feedback without a GitHub account. The issue tracker itself is private and requires collaborator access.
 

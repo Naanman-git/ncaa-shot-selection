@@ -21,7 +21,7 @@ from ncaa_shot_selection.product import (
 from ncaa_shot_selection.streamlit_compat import full_width_kwargs
 from ncaa_shot_selection.guide import render_beginner_guide
 from ncaa_shot_selection.explorer import (
-    render_comparison, render_player, render_context, render_story,
+    render_comparison, render_player, render_context,
     render_confidence, render_release,
 )
 
@@ -308,9 +308,9 @@ def main():
     st.caption("First visit? Open the sidebar using the top-left arrow and select Beginner’s guide for a tour or a term lookup.")
     if summary["count"] < 100:
         st.warning("Small sample: fewer than 100 recorded attempts. Treat maps and zone estimates as exploratory; a few shots can change them substantially.")
-    court_tab, scenario_tab, compare_tab, player_tab, context_tab, validation_tab, story_tab, methods_tab = st.tabs([
+    court_tab, scenario_tab, compare_tab, player_tab, context_tab, validation_tab, methods_tab = st.tabs([
         "Court explorer", "Shot-mix scenarios", "Compare teams", "Player development",
-        "Team context", "Model validation", "Story mode", "Methods & downloads",
+        "Team context", "Model validation", "Methods & downloads",
     ])
     with court_tab:
         st.subheader("One court. Three ways to read it.")
@@ -404,8 +404,6 @@ def main():
         render_context(season, team)
     with validation_tab:
         render_validation(results)
-    with story_tab:
-        render_story(scope, label, season, results)
     with methods_tab:
         render_methods(results)
         render_release(results)

@@ -1,6 +1,6 @@
 # NCAA Division I men’s shot selection
 
-CourtSense 1.1 adds team comparisons, printable HTML report cards, player season trends, scenario evidence checks, a guided story, and reconciled box-score context with estimated possession efficiency. Read [features, data attribution and limits](docs/FEATURES_AND_DATA_LIMITS.md). The prospective experiment remains excluded; exact possession reconstruction and missing shot context are not claimed.
+CourtSense 1.1 adds team comparisons, printable HTML report cards, player season trends, scenario evidence checks, and reconciled box-score context with estimated possession efficiency. Read [features, data attribution and limits](docs/FEATURES_AND_DATA_LIMITS.md). The prospective experiment remains excluded; exact possession reconstruction and missing shot context are not claimed.
 
 Quality checks validate the data snapshot and run the dashboard interactions. Rebuild into an isolated staging folder with `PYTHONPATH=src .venv/bin/python scripts/stage_snapshot.py`; review before promoting data. Snapshot dates and app/protocol versions appear under Methods & downloads.
 

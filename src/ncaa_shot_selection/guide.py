@@ -11,8 +11,7 @@ shots are to go in, and what a small change in shot selection could mean.
 4. Open **Player development** for a player's game-by-game trends.
 5. Explore **Shot-mix scenarios** and their uncertainty, or **Team context** for whole-offense estimates.
 6. Open **Model validation** to check prediction quality on later games.
-7. Use **Story mode** for a six-chapter walkthrough with the selected team or player.
-8. Visit **Methods & downloads** for reports, version details and a feedback note.
+7. Visit **Methods & downloads** for reports, version details and a feedback note.
 
 Use the arrow at the top of this sidebar to collapse it. Reopen it with the
 arrow in the top-left corner. Each topic below can also be opened or closed.

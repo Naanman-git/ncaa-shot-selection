@@ -1,4 +1,4 @@
-"""Comparison, player, context and guided-story pages."""
+"""Comparison, player and context pages."""
 from pathlib import Path
 import re
 import pandas as pd
@@ -182,43 +182,6 @@ def render_context(season,team):
         st.write("The data does not reliably attach defender distance, shot-clock pressure, fatigue or play type to the NCAA-native shot records. Game-final scores are outcomes, so they are not added as predictors of earlier shots. Exact second-chance possession sequences remain unavailable in this view.")
         st.markdown("Box-score source: [SportsDataverse / hoopR.mbb](https://github.com/sportsdataverse/hoopR-mbb-data), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). CourtSense joins, checks and aggregates these ESPN-origin records; no endorsement is implied.")
     st.download_button("Download selected team context",data.to_csv(index=False),file_name=f"team_context_{int(season)}.csv",mime="text/csv")
-
-
-def render_story(scope,label,season,results):
-    st.subheader("Tell the CourtSense story")
-    chapters=["1 · The question","2 · The evidence","3 · Read the court","4 · Explore a change","5 · Test the model","6 · What to take away"]
-    chapter=st.select_slider("Story chapter",chapters,key="story_chapter")
-    st.progress((chapters.index(chapter)+1)/len(chapters))
-    st.caption(f"Case study: {label} · {season-1}–{str(season)[-2:]}")
-    s=scope_summary(scope)
-    if chapter==chapters[0]:
-        st.header("Which shots offer more value?")
-        st.write("A 40% three-pointer is worth 1.20 expected points. A 50% two-pointer is worth 1.00. CourtSense explores that tradeoff using recorded NCAA attempts.")
-    elif chapter==chapters[1]:
-        st.header("Start with the sample")
-        st.write(f"This selection contains {s['count']:,} attempts from {s['games']} games. {s['fg_pct']:.1%} went in, producing {s['observed_pps']:.3f} points per attempt.")
-        st.write("Coverage is limited to available, reconciled source games. It is not a guarantee of a complete schedule.")
-    elif chapter==chapters[2]:
-        st.header("Darker squares show more recorded attempts")
-        chart(court_heatmap(court_bins(scope),"count"),"story_map")
-        st.write("Frequency tells us where shots happen. The Court explorer also shows predicted make probability and expected points.")
-    elif chapter==chapters[3]:
-        st.header("Make a modest change, then question it")
-        r=default_scenario(scope)
-        if r["feasible"]: st.write(f"The default scenario estimates {r['gain_per100']:+.1f} points per 100 attempts, with a conditional interval from {r['gain_low']:+.1f} to {r['gain_high']:+.1f}.")
-        else: st.info("The current sample or default limits do not support a feasible scenario.")
-        st.write("This assumes efficiency stays similar when shot mix changes. Defenders and shot availability can break that assumption.")
-    elif chapter==chapters[4]:
-        st.header("Check performance on later games")
-        r=next(x for x in results["model_comparison"] if x["season"]==2026 and x["model"]==results["selected_model"])
-        st.write(f"Across the full 2025–26 final evaluation, mean Brier score is {r['brier']:.4f} and mean log loss is {r['log_loss']:.4f}. Lower means better probability predictions. These scores do not change with this case-study selection.")
-        st.write("The model uses earlier seasons and prior-day player history; the Model validation page compares it with simpler baselines.")
-    else:
-        st.header("Use the evidence to ask better basketball questions")
-        st.write("Compare teams, review a player's season, download a report card, and inspect uncertainty before acting. These are descriptive research tools, not guarantees of better game results.")
-        st.write("No prospective experiment has been performed. The Methods page provides the research report, presentation and limitations.")
-    notes=f"CourtSense case study: {label}\nSeason: {season-1}–{str(season)[-2:]}\nAttempts: {s['count']:,}; games: {s['games']}; FG%: {s['fg_pct']:.1%}; observed points/attempt: {s['observed_pps']:.3f}.\nTalk order: question; evidence; court; scenario; model evaluation; limitations.\nScenario effects are conditional, not causal. Coverage is partial.\nRun: {results.get('run_id')}\n"
-    st.download_button("Download case-study speaking notes",notes,file_name="courtsense_talking_points.txt",mime="text/plain")
 
 
 def render_release(results):
