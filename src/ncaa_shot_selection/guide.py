@@ -1,168 +1,203 @@
-"""Plain-language help for first-time visitors to CourtSense."""
+"""Searchable, contextual explanations for first-time visitors."""
+from __future__ import annotations
+from dataclasses import dataclass, field
+from difflib import SequenceMatcher
+import re
+import unicodedata
+from .guide_catalog import BY_KEY, SECTIONS, TOPICS, Topic
 
-GUIDE_TOPICS = [
-    ("Start here · the one-minute tour", """
-CourtSense explores **where NCAA Division I men's teams shoot**, how likely those
-shots are to go in, and what a small change in shot selection could mean.
-
-1. In **Choose your view**, pick a season, team and optionally a player.
-2. Open **Court explorer** to see where shots happen and what they are worth.
-3. Try **Compare teams** and download a printable team report card.
-4. Open **Player development** for a player's game-by-game trends.
-5. Explore **Shot-mix scenarios** and their uncertainty, or **Team context** for whole-offense estimates.
-6. Open **Model validation** to check prediction quality on later games.
-7. Visit **Methods & downloads** for reports, version details and a feedback note.
-
-Use the arrow at the top of this sidebar to collapse it. Reopen it with the
-arrow in the top-left corner. Each topic below can also be opened or closed.
-"""),
-    ("Attempts, makes and field-goal % · fg_pct", """
-**Attempt** means a recorded two-point or three-point shot, whether made or missed.
-**Makes** counts the shots that went in. Free throws are excluded.
-
-**Field-goal percentage (FG%, fg_pct, raw_fg)** is makes divided by attempts.
-Making 45 of 100 shots gives **45%**. An exported value of **0.45 means 45%**.
-A two-pointer and a three-pointer each count as one attempt in this percentage.
-
-**Games represented** counts the distinct games in the selected data; coverage
-may not include every game played. **Shot share** is the fraction of attempts
-from a zone: 30 out of 100 attempts means a 30% share.
-"""),
-    ("Make probability · how likely a shot is to go in", """
-**Make probability** is the model's estimated chance of a successful shot.
-For example, 40% means about 40 makes out of 100 similar attempts if the
-estimate is well calibrated; it does not promise the next shot will go in.
-
-The estimate uses location, distance, angle, zone and the player's earlier
-shooting history. **Observed** describes what actually happened;
-**predicted** describes the model's estimate.
-"""),
-    ("Points per attempt · pps and expected points", """
-**Observed points per attempt (pps, observed_pps)** is points scored on recorded
-field goals divided by attempts. Scoring 110 points from 100 attempts gives **1.10**.
-
-**Predicted points per attempt (expected_pps)** averages each shot's estimated
-make probability multiplied by its two- or three-point value.
-A three-pointer with a 40% chance is worth **0.40 × 3 = 1.20 expected points**;
-a two-pointer with a 50% chance is worth **0.50 × 2 = 1.00**.
-
-These are averages, not points guaranteed on a single shot. Free throws,
-turnovers and offensive rebounds are not included, so this is not points per possession.
-"""),
-    ("Court maps, colour scales and zones", """
-Each small square groups recorded shots from a similar court location.
-Hover over a coloured square to see its value and number of attempts.
-
-- **Attempts:** darker squares contain more recorded shots.
-- **Make probability:** darker squares have a higher average predicted chance of a make.
-- **Points / attempt:** darker squares have higher average predicted points.
-
-Read the separate scale below each map. Count scales can change with the selection,
-so the same colour across different teams does not necessarily mean the same count.
-Blank cells have no eligible data or too few attempts; blank does not mean a 0% chance.
-The **minimum attempts** setting hides small samples in the two prediction maps.
-
-**At the rim:** near the basket. **Paint:** other shots inside the lane.
-**Midrange:** other two-point shots. **Corner three:** threes near the baseline
-corners. **Above-break three:** threes around the rest of the arc.
-Zone labels come from the source's court geometry and can be imperfect.
-"""),
-    ("Shot-mix scenarios · shares, pp and limits", """
-**Shot mix** is how a team's attempts are spread across zones. The scenario
-explores moving a limited share of attempts while assuming zone efficiency stays similar.
-
-**Percentage points (pp):** increasing a zone from 20% to 25% is a 5-point shift.
-**Maximum shift per zone** limits each zone's increase or decrease.
-**Total mix movement** adds all increases and decreases: moving 5 points from one
-zone to another uses 10 points of movement. **Three-point share cap** limits
-the fraction of attempts that are threes.
-
-**Estimated change / 100 attempts** expresses the estimated scoring difference
-over 100 shots. It does not predict a team's final score or prove a strategy will work.
-An **infeasible** scenario means the selected limits cannot all be satisfied.
-"""),
-    ("Uncertainty, adjusted rates and scenario exports", """
-**Adjusted make rate (shrunk_fg)** blends a zone's recorded make rate with
-an earlier pooled rate. Small samples are pulled more toward that pooled rate
-so a few lucky shots have less influence. This adjustment is called **shrinkage**.
-
-**Estimated points (ep)** in the scenario equal that adjusted rate times the shot value.
-**ep_low / ep_high** are the lower and upper resampling bounds for that estimate.
-**current_share / recommended_share** describe the recorded and scenario shot mix.
-**Eligible** means a zone has enough observations to allow its mix to change.
-
-The **95% interval** summarizes variation when the analysis resamples whole games.
-If the change interval crosses zero, those resampled estimates include both gains
-and losses. It does not include every source of uncertainty, such as how defenders
-would react. A higher **uncertainty penalty** favors more certain zone estimates;
-it is not a confidence percentage.
-"""),
-    ("Model validation · Brier score, log loss and calibration", """
-Validation checks predictions against outcomes in later games. The evaluation
-season selector controls these results; team and player filters do not change them.
-
-**Mean Brier score** averages the squared gap between the predicted probability
-and the actual result (made = 1, missed = 0). Lower is better; 0 is perfect.
-For a 70% prediction, a make contributes (0.70 − 1)² = 0.09;
-a miss contributes (0.70 − 0)² = 0.49.
-
-**Mean log loss** measures the penalty for the probability assigned to the result
-that happened. It penalizes very confident wrong predictions especially strongly.
-Lower is better; 0 is perfect. These scores are not shooting percentages and their
-numerical sizes are not directly comparable to each other.
-
-**Calibration** asks whether predicted chances match actual make rates.
-If shots predicted at 40% go in about 40% of the time, that group is well calibrated.
-The diagonal on the chart represents perfect agreement.
-
-A **baseline** is a simple reference model. The global-rate baseline assigns the
-same training-data make rate to every shot. Compare scores on the same evaluation
-shots. A **hypothesis** is a research claim tested against the data;
-a **coefficient** describes a model association, not proof of cause and effect.
-"""),
-    ("Possessions, team context and player trends", """
-**Points per estimated possession** includes the team's total score, including free
-throws. Estimated possessions account for shots, offensive rebounds, turnovers
-and free-throw attempts. They are approximations from box scores, not counted play sequences.
-The **Team context** page explains the formula and shows home/away designations.
-Neutral-site games can still carry a home/away designation in the source.
-
-**Player development** shows one player's selected season. The recent five-game
-average divides all points by all attempts in that window, so small games do not
-receive equal weight to large ones. Practice prompts suggest video-review questions;
-they are not validated training advice. Source player IDs usually change between
-seasons, so cross-season identities are not automatically merged.
-
-**Sample support** labels summarize observations: usable = at least 30 attempts in
-5 games; broader = at least 100 attempts in 10 games. They do not measure the
-probability that a recommendation will succeed.
-"""),
-    ("What to trust · methods and downloads", """
-The project trains on 2022–23 and 2023–24, selects its model on 2024–25,
-and uses 2025–26 for the final evaluation. Earlier player results may update
-shooting history; current and future outcomes are excluded from a shot's inputs.
-
-This is evidence about recorded shots. Defender distance, fatigue, shot-clock
-pressure and available passing options are not all captured. Small samples and
-missing source games can affect conclusions.
-
-In **Methods & downloads**, get the report for the research detail, the presentation
-for a walkthrough, and the saved analysis results for the numbers behind the app.
-The prospective protocol and blank template describe a possible future experiment;
-no real prospective experiment results are claimed.
-"""),
-]
+STOP_WORDS = frozenset('a an the what whats is are was were does do did can could would should i me my we you it its this that these those mean means meaning explain explanation understand tell about please how why read use work works on in of for and with'.split())
 
 
-def render_beginner_guide(st):
-    """Render inside the sidebar; search reveals all matching topics."""
-    st.subheader("Beginner’s guide")
-    st.caption("New to basketball analytics? Open a topic or search for a term.")
-    query = st.text_input("Find a term or topic", placeholder="Try fg_pct, pps, probability…", key="guide_search").strip().casefold()
-    matches = [(title, body) for title, body in GUIDE_TOPICS
-               if not query or query in (title + " " + body).casefold()]
-    if not matches:
-        st.info("No matching topic. Try a shorter term, or clear the search to see the full guide.")
-    for index, (title, body) in enumerate(matches):
-        with st.expander(title, expanded=bool(query) or index == 0):
-            st.markdown(body)
+def normalize(value: str) -> str:
+    value = unicodedata.normalize('NFKD', value).casefold().replace('%', ' percent ').replace('ρ', ' rho ')
+    return ' '.join(re.findall(r'[a-z0-9]+', value))
+
+
+def search_topics(query: str, limit: int = 8) -> list[Topic]:
+    """Rank reviewed explanations; never invent an answer to an unknown term."""
+    raw = normalize(query)
+    terms = [w for w in raw.split() if w not in STOP_WORDS]
+    if not terms:
+        return [entry for entry in TOPICS if raw and any(normalize(alias) == raw for alias in (entry.title, *entry.aliases))][:limit]
+    tokens = set(terms)
+    compact = ''.join(terms)
+    ranked = []
+    for index, entry in enumerate(TOPICS):
+        best = 0.0
+        for alias in (entry.title, *entry.aliases):
+            name = normalize(alias)
+            # Do not turn "how to use" into the basketball abbreviation TO.
+            if len(compact) < 4 and name.replace(' ', '') != compact:
+                continue
+            words = [w for w in name.split() if w not in STOP_WORDS]
+            alias_tokens = set(words)
+            reduced = ''.join(words)
+            if raw == normalize(alias) or compact == reduced:
+                best = max(best, 100)
+            elif tokens <= alias_tokens:
+                best = max(best, 70 + 15 * len(tokens) / max(len(alias_tokens), 1))
+            elif len(alias_tokens) >= 2 and alias_tokens <= tokens:
+                best = max(best, 65 + 15 * len(alias_tokens) / len(tokens))
+            # Short IDs such as TO and OR need exact matches, not fuzzy ones.
+            elif len(compact) >= 4 and len(reduced) >= 4:
+                ratio = SequenceMatcher(None, compact, reduced).ratio()
+                if ratio >= .80:
+                    best = max(best, 50 + 15 * ratio)
+        if not best and len(tokens) >= 2:
+            body = set(normalize(entry.meaning + ' ' + entry.details).split())
+            if tokens <= body:
+                best = 30
+        if best:
+            ranked.append((best, index, entry))
+    ranked.sort(key=lambda row: (-row[0], row[1]))
+    return [entry for _, _, entry in ranked[:limit]]
+
+
+@dataclass
+class GuideContext:
+    label: str
+    season: int
+    summary: dict
+    evaluation: dict = field(default_factory=dict)
+    scenario: dict = field(default_factory=dict)
+    minimum: int = 5
+    visible: int = 0
+    outside: int = 0
+    mean_probability: float = 0.0
+    team_label: str = ''
+    team_totals: dict = field(default_factory=dict)
+    profile_label: str = ''
+    profile_summary: dict = field(default_factory=dict)
+
+
+def season_label(year: int) -> str:
+    return f'{year - 1}–{str(year)[-2:]}'
+
+
+def selection_example(key: str, context: GuideContext) -> str | None:
+    """Label the correct population and units before explaining actual values."""
+    s = context.summary
+    scope = f'**{context.label} · {season_label(context.season)}**'
+    count, games = s.get('count', 0), s.get('games', 0)
+    examples = {
+        'tour': f'Your shot view is {scope}: **{count:,} attempts** across **{games:,} games**. Start with Court explorer, then check Model validation.',
+        'filters': f'The main shot cards, court maps and scenario currently describe {scope}. Other pages state their own selection rules.',
+        'attempts': f'For {scope}, **{count:,}** is the number of recorded field-goal attempts, including makes and misses.',
+        'games': f'For {scope}, **{games:,}** counts different covered game IDs rather than attempts or both teams\' participation counts.',
+        'makes': f'For {scope}, **{round(s.get("fg_pct", 0) * count):,}** of **{count:,}** recorded attempts were made.',
+        'fg': f'For {scope}, **{s.get("fg_pct", 0):.1%}** means about **{100 * s.get("fg_pct", 0):.1f} makes per 100 attempts** at the observed rate. This excludes free throws.',
+        'observed-pps': f'For {scope}, **{s.get("observed_pps", 0):.3f}** means about **{100 * s.get("observed_pps", 0):.1f} actual field-goal points per 100 attempts** at this sample\'s average rate.',
+        'predicted-pps': f'For {scope}, **{s.get("expected_pps", 0):.3f}** corresponds to **{100 * s.get("expected_pps", 0):.1f} predicted field-goal points per 100 attempts** like those recorded, under the frozen model.',
+        'probability': f'For {scope}, the mean predicted make chance is **{context.mean_probability:.1%}** across recorded attempts. Individual shots can have different probabilities.',
+        'map': f'The displayed court contains **{context.visible:,}** attempts from {scope}. **{context.outside:,}** outside this drawing remain in the main totals. The prediction-map minimum is **{context.minimum}** per cell.',
+        'minimum': f'Your minimum is **{context.minimum} attempts per cell**. Cells below it are blank on the two prediction maps; the count map and top totals retain them.',
+        'support': f'The overall shot selection is {scope}: **{count:,} attempts in {games:,} games**. Zone support must be read separately; a large total does not imply every zone is well supported.',
+        'gap': f'For the main selection {scope}, observed minus predicted points per attempt is **{s.get("observed_pps", 0) - s.get("expected_pps", 0):+.3f}**. Player development\'s review prompt uses its independently selected profile and zone.',
+        'player-development': f'Player development currently uses **{context.profile_label}**: **{context.profile_summary.get("count", 0):,} attempts in {context.profile_summary.get("games", 0):,} games**. Its profile selector is independent of the sidebar player choice.',
+        'trend': f'The game trend currently belongs to **{context.profile_label} · {season_label(context.season)}**, with **{context.profile_summary.get("games", 0):,} recorded games**. Recent windows use up to five of those games.',
+    }
+    if key in examples:
+        return examples[key]
+    e = context.evaluation
+    if key in {'validation', 'brier', 'log-loss', 'calibration', 'baseline', 'training'} and e:
+        label = f'**{season_label(int(e["season"]))} full evaluation dataset**'
+        if key == 'brier':
+            detail = f'Mean Brier score is **{e["brier"]:.4f}**, the average squared probability error over **{int(e["n"]):,} attempts**. It is not a shooting percentage.'
+        elif key == 'log-loss':
+            detail = f'Mean log loss is **{e["log_loss"]:.4f}**, the average penalty for the actual results over **{int(e["n"]):,} attempts**. Lower is better on the same shots.'
+        else:
+            detail = f'The selected model is **{e["model"]}**. It has Brier **{e["brier"]:.4f}** and log loss **{e["log_loss"]:.4f}** over **{int(e["n"]):,} attempts**.'
+        return f'For the {label}: {detail} The sidebar team and player do not change these results.'
+    if key in {'scenario', 'gain', 'interval', 'mix', 'scenario-ep', 'feasible'}:
+        r = context.scenario
+        if not r:
+            return f'The main scenario is unavailable for {scope}; at least 100 attempts are needed to show its controls.'
+        if not r.get('feasible'):
+            return f'For {scope}, the current scenario is unavailable: {r.get("message", "The selected limits cannot all be satisfied.")} No valid scoring gain is reported.'
+        return (f'For {scope}, your current settings estimate **{r["current_ep"]:.3f} → {r["recommended_ep"]:.3f} points per attempt**, '
+                f'or **{r["gain_per100"]:+.1f} points per 100 attempts**. Its conditional 95% interval is '
+                f'**{r["gain_low"]:+.1f} to {r["gain_high"]:+.1f}**. These assume unchanged zone efficiencies.')
+    if key in {'context', 'possession', 'possession-rate', 'ft', 'fta', 'turnovers', 'rebounds', 'team-games', 'designation'}:
+        t = context.team_totals
+        if not t or t.get('possessions', 0) <= 0:
+            return 'No reconciled team context is available for this team and season. Shot statistics remain a separate view.'
+        return (f'Team context uses **{context.team_label} · {season_label(context.season)}**, regardless of the sidebar player. '
+                f'It covers **{int(t["games"]):,} team-games**, **{t["possessions"]:,.1f} estimated possessions**, '
+                f'and **{t["points"] / t["possessions"]:.3f} points per estimated possession**. '
+                f'It includes **{int(t["free_throws"]):,} free-throw points** and '
+                f'**{100 * t["turnovers"] / t["possessions"]:.1f} turnovers per 100 estimated possessions**.')
+    return None
+
+
+def guide_markdown() -> str:
+    """Use the same catalog for both the sidebar and the offline reference."""
+    lines = ['# CourtSense beginner\'s guide', '', f'{len(TOPICS)} explanations of the interface and downloadable field names.', '',
+             'The interactive guide also shows examples from your current selection. This download contains general explanations and worked examples, not live-filtered values.', '']
+    for section in SECTIONS:
+        lines.extend([f'## {section}', ''])
+        for entry in TOPICS:
+            if entry.section != section:
+                continue
+            lines.extend([f'### {entry.title}', '', entry.meaning, '', '**Example:** ' + entry.example, '',
+                          '**More detail:** ' + entry.details, '', '**Also called / searchable fields:** ' + '; '.join(entry.aliases), '',
+                          '**Related:** ' + '; '.join(BY_KEY[key].title for key in entry.related), ''])
+    return '\n'.join(lines)
+
+
+def _set_query(st, query: str) -> None:
+    st.session_state['guide_search'] = query
+
+
+def render_beginner_guide(st, context: GuideContext) -> None:
+    st.subheader('Understand the numbers')
+    st.caption(f'{len(TOPICS)} plain-language explanations. Search a label, abbreviation, exported field or question.')
+    query = st.text_input('Find a term or ask what it means', placeholder='What does fg_pct mean?', key='guide_search').strip()
+    if query:
+        st.button('Clear search', key='guide_clear', on_click=_set_query, args=(st, ''))
+    else:
+        a, b = st.columns(2)
+        a.button('FG%', key='guide_quick_fg', on_click=_set_query, args=(st, 'fg_pct'), width='stretch')
+        b.button('PPS', key='guide_quick_pps', on_click=_set_query, args=(st, 'pps'), width='stretch')
+        a.button('Model accuracy', key='guide_quick_validation', on_click=_set_query, args=(st, 'model validation'), width='stretch')
+        b.button('Sample support', key='guide_quick_support', on_click=_set_query, args=(st, 'sample support'), width='stretch')
+    entry = None
+    if query:
+        matches = search_topics(query)
+        if not matches:
+            st.info('I couldn’t find that term in the guide. Try a label from the page, an abbreviation such as FG%, or a question such as “what is log loss?”. You can also clear the search and browse by page.')
+            for key in ('tour', 'probability', 'possession', 'validation'):
+                st.button(BY_KEY[key].title, key=f'guide_suggestion_{key}', on_click=_set_query, args=(st, BY_KEY[key].title))
+        else:
+            ids = [entry.key for entry in matches]
+            if len(ids) == 1:
+                selected = ids[0]
+            else:
+                st.caption(f'{len(matches)} relevant explanations. Closest match first.')
+                selected = st.selectbox('Matching explanation', ids, format_func=lambda key: BY_KEY[key].title, key=f'guide_match_{normalize(query)}')
+            entry = BY_KEY[selected]
+    else:
+        section = st.selectbox('Browse by page or topic', ['Start here', *SECTIONS], key='guide_section')
+        ids = ['tour'] if section == 'Start here' else [entry.key for entry in TOPICS if entry.section == section]
+        selected = ids[0] if len(ids) == 1 else st.selectbox('Choose an explanation', ids, format_func=lambda key: BY_KEY[key].title, key=f'guide_browse_{section}')
+        entry = BY_KEY[selected]
+    if entry:
+        st.markdown(f'### {entry.title}')
+        st.markdown(entry.meaning)
+        current = selection_example(entry.key, context)
+        if current:
+            with st.container(border=True):
+                st.markdown('**On your screen**')
+                st.markdown(current)
+        st.markdown('**A simple example**')
+        st.markdown(entry.example)
+        with st.expander('More detail & how to interpret it'):
+            st.markdown(entry.details)
+            st.caption('Also called: ' + '; '.join(entry.aliases))
+        if entry.related:
+            st.caption('Keep learning')
+            for key in entry.related:
+                st.button(BY_KEY[key].title, key=f'guide_related_{entry.key}_{key}', on_click=_set_query, args=(st, BY_KEY[key].title))
+    st.divider()
+    st.download_button('Download the complete guide', guide_markdown(), file_name='CourtSense_beginner_guide.md', mime='text/markdown', key='guide_download', width='stretch')
+    st.caption('Search retrieves reviewed explanations. The download includes all topics, examples and field-name aliases for offline reading.')

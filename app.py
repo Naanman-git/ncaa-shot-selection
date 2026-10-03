@@ -19,7 +19,7 @@ from ncaa_shot_selection.product import (
     load_analysis, load_scored_data, run_scenario, scope_summary,
 )
 from ncaa_shot_selection.streamlit_compat import full_width_kwargs
-from ncaa_shot_selection.guide import render_beginner_guide
+from ncaa_shot_selection.guide import GuideContext, render_beginner_guide
 from ncaa_shot_selection.explorer import (
     render_comparison, render_player, render_context,
     render_confidence, render_release,
@@ -288,8 +288,6 @@ def main():
             cell_minimum = st.slider("Minimum attempts per model-map cell", 1, 30, 5, help="Only the probability and expected-points maps hide cells below this threshold. The frequency map retains all visible attempts.")
             st.caption("Source seasons use the ending year. This explorer covers men's Division I basketball only.")
             st.markdown('<div class="note">A shot-quality estimate is evidence for a question, not a guarantee of a better play.</div>', unsafe_allow_html=True)
-        with guide_tab:
-            render_beginner_guide(st)
     st.markdown('<p class="eyebrow">NCAA DIVISION I · MEN’S BASKETBALL</p>', unsafe_allow_html=True)
     st.title("Find the value in every zone.")
     st.markdown('<p class="lead">Explore where teams shoot, how likely those attempts are to fall, and what a carefully constrained change in shot mix could mean.</p>', unsafe_allow_html=True)
@@ -299,6 +297,7 @@ def main():
         st.info("No attempts match this selection. Choose another team or player.")
         st.stop()
     summary = scope_summary(scope)
+    scenario = {}
     cards = st.columns(5)
     cards[0].metric("Recorded attempts", f"{summary['count']:,}", help=f"Across {summary['games']:,} distinct games in the available source.")
     cards[1].metric("Games represented", f"{summary['games']:,}")
@@ -399,14 +398,27 @@ def main():
     with compare_tab:
         render_comparison(shots, season, team, results)
     with player_tab:
-        render_player(shots, season, team, player)
+        profile = render_player(shots, season, team, player)
     with context_tab:
-        render_context(season, team)
+        team_totals = render_context(season, team)
     with validation_tab:
         render_validation(results)
     with methods_tab:
         render_methods(results)
         render_release(results)
+    evaluation = next((row for row in results.get("model_comparison", [])
+                       if row["model"] == results.get("selected_model")
+                       and row["season"] == st.session_state.get("validation_season")), {})
+    with guide_tab:
+        render_beginner_guide(st, GuideContext(
+            label=label, season=season, summary=summary, evaluation=evaluation,
+            scenario=scenario, minimum=cell_minimum,
+            visible=bins["visible"], outside=bins["outside"],
+            mean_probability=float(scope["model_p"].mean()),
+            team_label=team, team_totals=team_totals or {},
+            profile_label=profile[0] if profile else "No profile available",
+            profile_summary=profile[1] if profile else {},
+        ))
     st.markdown(f'<div class="footer">CourtSense · NCAA men’s basketball research · Run {escape(str(results.get("run_id", "unavailable")))} · Academic study & portfolio explorer</div>', unsafe_allow_html=True)
 
 

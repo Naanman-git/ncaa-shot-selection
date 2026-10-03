@@ -147,6 +147,7 @@ def render_player(shots, season, team, selected_player):
     st.caption("These prompts describe this sample, not a diagnosis of ability or a validated training prescription. Training-season model estimates are in-sample.")
     chart(court_heatmap(court_bins(f),"count"),"player_court")
     st.download_button("Download player game trend",trend.to_csv(index=False),file_name=f"player_{int(season)}_trend.csv",mime="text/csv")
+    return f"{options.loc[player,'name']} · {options.loc[player,'team']}", s
 
 
 @st.cache_data(show_spinner=False)
@@ -182,6 +183,7 @@ def render_context(season,team):
         st.write("The data does not reliably attach defender distance, shot-clock pressure, fatigue or play type to the NCAA-native shot records. Game-final scores are outcomes, so they are not added as predictors of earlier shots. Exact second-chance possession sequences remain unavailable in this view.")
         st.markdown("Box-score source: [SportsDataverse / hoopR.mbb](https://github.com/sportsdataverse/hoopR-mbb-data), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). CourtSense joins, checks and aggregates these ESPN-origin records; no endorsement is implied.")
     st.download_button("Download selected team context",data.to_csv(index=False),file_name=f"team_context_{int(season)}.csv",mime="text/csv")
+    return totals.to_dict()
 
 
 def render_release(results):

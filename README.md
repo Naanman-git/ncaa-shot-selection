@@ -4,6 +4,8 @@ CourtSense 1.1 adds team comparisons, printable HTML report cards, player season
 
 Quality checks validate the data snapshot and run the dashboard interactions. Rebuild into an isolated staging folder with `PYTHONPATH=src .venv/bin/python scripts/stage_snapshot.py`; review before promoting data. Snapshot dates and app/protocol versions appear under Methods & downloads.
 
+The sidebar's **Beginner’s guide** provides 100 reviewed explanations with plain meanings, worked examples, optional detail and related terms. Search labels, acronyms, exported column names or questions; common typos are supported. Relevant answers use the actual selected shot view, independent evaluation season, whole-team context or player profile. The [complete offline guide](docs/BEGINNER_GUIDE.md) is also downloadable in the app. See [coverage and maintenance](docs/GUIDE_COVERAGE.md) for the term audit and checks.
+
 This finished project studies recorded NCAA Division I men’s field-goal attempts. It produces a reproducible probability model, a transparent constrained shot-mix scenario, an interactive Streamlit explorer, an academic PDF and an editable presentation.
 
 The repository also includes the blueprint-completion package: a formal coding guide, four prespecified hypotheses with saved held-out results, interpretable standardized model terms, and a prospective validation protocol with an anonymous data template and analysis script. A prospective strategy result is intentionally absent until valid post-freeze observations are collected.
