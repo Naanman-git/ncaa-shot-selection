@@ -1,0 +1,18 @@
+{
+  "analysis-json": {
+    "source_path": "data/app/final_results.json",
+    "source_name": "ncaa_analysis_results.json",
+    "source_url": "https://courtsense-ncaa.streamlit.app/?source=analysis-json",
+    "source_sha256": "76e22d897dedabd5fe40cf59478fd40e713e3d65f811e4219d7b016964fcea2d",
+    "pdf_name": "ncaa_analysis_results.pdf",
+    "pdf_sha256": "63cf7c0a724e3d9ec40d5ec2387319ece4cd705ae943639bbd89d9f14ab88055"
+  },
+  "validation-markdown": {
+    "source_path": "docs/PROSPECTIVE_VALIDATION_PROTOCOL.md",
+    "source_name": "PROSPECTIVE_VALIDATION_PROTOCOL.md",
+    "source_url": "https://courtsense-ncaa.streamlit.app/?source=validation-markdown",
+    "source_sha256": "9d07fc2da70e4f92abec2933f929dca521e9e709baf04e8b1a9167e3585b96d8",
+    "pdf_name": "ncaa_validation_protocol.pdf",
+    "pdf_sha256": "a64bf24499a42cf23c577550930e03edb405b2636937b07b83ea335783636ad8"
+  }
+}

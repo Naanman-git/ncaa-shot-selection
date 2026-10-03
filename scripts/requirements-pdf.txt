@@ -1,0 +1,3 @@
+# Build/QA tools only; the Streamlit app serves prebuilt PDFs.
+reportlab>=4.4,<5
+pypdf>=6.10,<7

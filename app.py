@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from html import escape
-import json
 from pathlib import Path
 import sys
 
@@ -23,6 +22,9 @@ from ncaa_shot_selection.guide import GuideContext, render_beginner_guide
 from ncaa_shot_selection.explorer import (
     render_comparison, render_player, render_context,
     render_confidence, render_release,
+)
+from ncaa_shot_selection.research_downloads import (
+    APP_URL, DOWNLOADS, research_pdf, source_download,
 )
 
 st.set_page_config(page_title="CourtSense · NCAA shot selection", page_icon="🏀", layout="wide", initial_sidebar_state="expanded")
@@ -227,30 +229,67 @@ def render_methods(results: dict):
     with st.expander("Audit and run details"):
         st.json({"run_id": results.get("run_id", "unavailable"), "audit": results.get("audit", {})}, expanded=False)
     st.markdown("### Take the research with you")
+    st.caption("The analysis results and validation protocol download as PDFs. Each includes its original JSON or Markdown file as an attachment and a link to download that format from CourtSense.")
     downloads = st.columns(5)
     with downloads[0]:
-        download_button("Download analysis results", json.dumps(results, indent=2, default=str), file_name="ncaa_analysis_results.json", mime="application/json")
-    candidates = [(ROOT / "output/pdf", ".pdf", "application/pdf"), (ROOT / "output/presentation", ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation")]
-    for col, (directory, suffix, mime) in zip(downloads[1:3], candidates):
-        files = sorted(directory.glob(f"*{suffix}")) if directory.exists() else []
-        if files:
-            artifact = files[-1]
+        render_research_pdf(DOWNLOADS[0], "Download analysis results (PDF)")
+    candidates = [
+        (ROOT / "output/pdf/ncaa_shot_selection_report.pdf", "Download research report", "application/pdf"),
+        (ROOT / "output/presentation/ncaa_shot_selection.pptx", "Download presentation", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+    ]
+    for col, (artifact, label, mime) in zip(downloads[1:3], candidates):
+        if artifact.exists():
             with col:
-                download_button("Download research report" if suffix == ".pdf" else "Download presentation", artifact.read_bytes(), file_name=artifact.name, mime=mime)
+                download_button(label, artifact.read_bytes(), file_name=artifact.name, mime=mime)
         else:
-            col.caption("Research report pending" if suffix == ".pdf" else "Presentation pending")
-    protocol = ROOT / "docs/PROSPECTIVE_VALIDATION_PROTOCOL.md"
+            col.caption("Research report pending" if artifact.suffix == ".pdf" else "Presentation pending")
     template = ROOT / "data/templates/prospective_shots_template.csv"
-    if protocol.exists():
-        with downloads[3]:
-            download_button("Download validation protocol", protocol.read_text(), file_name=protocol.name, mime="text/markdown")
+    with downloads[3]:
+        render_research_pdf(DOWNLOADS[1], "Download validation protocol (PDF)")
     if template.exists():
         with downloads[4]:
             download_button("Download shot template", template.read_bytes(), file_name=template.name, mime="text/csv")
 
 
+def render_research_pdf(item, label: str):
+    try:
+        pdf = research_pdf(ROOT, item)
+    except (OSError, ValueError, KeyError):
+        st.info("This PDF is being prepared. Its original file is available below.")
+    else:
+        download_button(label, pdf, file_name=item.pdf_name, mime="application/pdf")
+    original_format = "JSON" if item.key == "analysis-json" else "Markdown"
+    st.markdown(f"[Original {original_format}]({item.source_url})")
+
+
+def render_original_source(key: str):
+    """PDF links reach a lightweight public page, without loading the shot data."""
+    item = source_download(key)
+    if item is None:
+        st.title("Research download not found")
+        st.info("Choose one of the named downloads in Methods & downloads.")
+    else:
+        original_format = "JSON" if item.key == "analysis-json" else "Markdown (.md)"
+        st.title(f"{item.title}: original file")
+        st.write(f"Download the original {original_format} file behind the PDF. This file comes from the current saved project build; it does not follow interactive team or player filters.")
+        st.caption("For the exact version included with a previously downloaded PDF, save the embedded file from that PDF's Attachments panel in a reader that supports attachments.")
+        try:
+            source = (ROOT / item.source_path).read_bytes()
+        except OSError:
+            st.warning("The original file is temporarily unavailable.")
+        else:
+            download_button(f"Download original {original_format}", source,
+                            file_name=item.source_name, mime=item.source_mime)
+            st.caption("JSON holds structured analysis values; Markdown is an editable text document. Both can be opened in a text editor.")
+    st.link_button("Return to CourtSense", APP_URL)
+
+
 def main():
     st.markdown('<div class="masthead"><div class="brand"><i>◉</i> CourtSense</div><div class="edition">COLLEGE BASKETBALL / RESEARCH EXPLORER</div></div>', unsafe_allow_html=True)
+    source_key = st.query_params.get("source")
+    if source_key is not None:
+        render_original_source(source_key)
+        return
     try:
         results, shots = analysis_data()
     except (FileNotFoundError, ValueError, KeyError) as exc:

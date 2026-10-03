@@ -1070,11 +1070,11 @@ Prospective means collecting new observations after fixing the plan. The project
 
 **Example:** A future participant could record attempts using the template, then the analyzer could compare frozen probabilities with new outcomes. The example row must be removed before collecting real data.
 
-**More detail:** No real prospective experiment has been conducted or reported. The protocol specifies anonymous participant codes, sessions, strategy blocks and recording order. Session-cluster intervals keep observations from the same session together. Historical scenarios are not substitutes for an experiment. The analyzer can process future data, but it cannot create genuine results without observations.
+**More detail:** No real prospective experiment has been conducted or reported. Download validation protocol (PDF) gives the full collection plan. Its original Markdown (.md) text is embedded as an attachment and can also be downloaded using the link inside the PDF. The protocol specifies anonymous participant codes, sessions, strategy blocks and recording order. Session-cluster intervals keep observations from the same session together. Historical scenarios are not substitutes for an experiment. The analyzer can process future data, but it cannot create genuine results without observations.
 
 **Also called / searchable fields:** prospective; prospective validation; protocol; validation protocol; anonymous shot template; prospective outcome; analyzer; post-freeze protocol; real experiment
 
-**Related:** Anonymous participant codes and shot IDs; Session, blocks and attempt order; Current versus recommended strategy blocks; 95% interval / CI and uncertainty
+**Related:** Anonymous participant codes and shot IDs; Session, blocks and attempt order; Current versus recommended strategy blocks; 95% interval / CI and uncertainty; PDF and the research report
 
 ### CC BY 4.0: attribution license
 
@@ -1168,11 +1168,11 @@ JSON stands for JavaScript Object Notation. It stores labeled values, lists and 
 
 **Example:** model_comparison lists model names and scores. scenario groups a saved case-study scenario with its settings and zone table. audit groups data-quality checks.
 
-**More detail:** The file can be read with a text editor or Python; JavaScript programming is not required. Its saved case study need not match your current interactive filters. True and false are boolean values such as feasibility; numbers retain their units from the relevant definition. Search field names in this guide before interpreting decimal rates or interval bounds. JSON itself is a file format, not a prediction method.
+**More detail:** Download analysis results (PDF) gives a readable overview and the complete JSON appendix. The PDF embeds the unchanged original JSON file and includes a link to a CourtSense page with an original-file download button. JSON can be read with a text editor or Python; JavaScript programming is not required. Its saved case study need not match your current interactive filters. True and false are boolean values such as feasibility; numbers retain their units from the relevant definition. Search field names in this guide before interpreting decimal rates or interval bounds. JSON itself is a file format, not a prediction method.
 
 **Also called / searchable fields:** JSON; JavaScript Object Notation; saved analysis results; analysis results; data dictionary
 
-**Related:** Configuration, settings and model specification; Data audit, cleaning and duplicate checks; Saved snapshot, freeze, run and version; CSV: spreadsheet-friendly tables
+**Related:** Configuration, settings and model specification; Data audit, cleaning and duplicate checks; Saved snapshot, freeze, run and version; CSV: spreadsheet-friendly tables; PDF and the research report
 
 ### PDF and the research report
 
@@ -1180,11 +1180,11 @@ PDF stands for Portable Document Format. The research report is a fixed-layout d
 
 **Example:** Use the report when you need the research reasoning behind the dashboard rather than just one team's current view.
 
-**More detail:** The report reflects the saved analysis build. Its case-study numbers can differ from a newly selected team or customized scenario in the app. The printable team report card is downloaded as HTML; your browser's Print → Save as PDF creates a PDF copy of that handout. A report's format does not make its conclusions stronger than the underlying evidence.
+**More detail:** The research report, analysis results and prospective validation protocol are separate PDF downloads. The latter two include their original JSON or Markdown (.md) file as an attachment: a file stored inside the PDF. Open your PDF reader's Attachments panel to save it; some browser viewers hide attachments, so each PDF also has a link to download the original from CourtSense. Markdown is an editable text format where symbols such as # mark headings. The web link serves the current project file; the attachment preserves the version used to build that PDF. Saved case-study numbers can differ from your current app filters. The printable team report card is downloaded as HTML; your browser's Print → Save as PDF creates a PDF copy. A document format does not strengthen the underlying evidence.
 
 **Also called / searchable fields:** PDF; Portable Document Format; research report; download research report; print
 
-**Related:** Compare teams and printable report cards; Saved snapshot, freeze, run and version; HTML and browser report cards
+**Related:** Compare teams and printable report cards; Saved snapshot, freeze, run and version; HTML and browser report cards; JSON: saved analysis results; Prospective validation, protocol and analyzer
 
 ### PPTX and the presentation
 

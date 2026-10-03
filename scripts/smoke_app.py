@@ -10,6 +10,8 @@ def check():
 check()
 download_labels = {element.proto.label for element in app.get('download_button')}
 assert {'Download selected team context', 'Download the complete guide'} <= download_labels
+assert {'Download analysis results (PDF)', 'Download validation protocol (PDF)',
+        'Download research report', 'Download presentation'} <= download_labels
 app.button(key='check_stability').click().run();check()
 app.text_input(key='guide_search').set_value('possessions').run();check()
 assert any('Team context uses' in element.value for element in app.markdown)
