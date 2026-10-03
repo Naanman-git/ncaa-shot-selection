@@ -230,24 +230,25 @@ def render_methods(results: dict):
         st.json({"run_id": results.get("run_id", "unavailable"), "audit": results.get("audit", {})}, expanded=False)
     st.markdown("### Take the research with you")
     st.caption("The analysis results and validation protocol download as PDFs. Each includes its original JSON or Markdown file as an attachment and a link to download that format from CourtSense.")
-    downloads = st.columns(5)
-    with downloads[0]:
+    pdf_downloads = st.columns(2)
+    with pdf_downloads[0]:
         render_research_pdf(DOWNLOADS[0], "Download analysis results (PDF)")
+    with pdf_downloads[1]:
+        render_research_pdf(DOWNLOADS[1], "Download validation protocol (PDF)")
+    downloads = st.columns(3)
     candidates = [
         (ROOT / "output/pdf/ncaa_shot_selection_report.pdf", "Download research report", "application/pdf"),
         (ROOT / "output/presentation/ncaa_shot_selection.pptx", "Download presentation", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
     ]
-    for col, (artifact, label, mime) in zip(downloads[1:3], candidates):
+    for col, (artifact, label, mime) in zip(downloads[:2], candidates):
         if artifact.exists():
             with col:
                 download_button(label, artifact.read_bytes(), file_name=artifact.name, mime=mime)
         else:
             col.caption("Research report pending" if artifact.suffix == ".pdf" else "Presentation pending")
     template = ROOT / "data/templates/prospective_shots_template.csv"
-    with downloads[3]:
-        render_research_pdf(DOWNLOADS[1], "Download validation protocol (PDF)")
     if template.exists():
-        with downloads[4]:
+        with downloads[2]:
             download_button("Download shot template", template.read_bytes(), file_name=template.name, mime="text/csv")
 
 
